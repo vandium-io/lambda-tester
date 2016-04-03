@@ -12,7 +12,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Lightweight and won't impact performance
 * Works with Node 0.10.36
 
-## Installation
+## Installation 
 Install via npm.
 
 	npm install lambda-tester --save-dev
