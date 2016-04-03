@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Helps unit test AWS Lambda handlers",
   "main": "index.js",
   "keywords": [
