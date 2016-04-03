@@ -24,7 +24,7 @@ The following example shows a simple case for validating that the Lambda (handle
 ```js
 var LambdaTester = require( 'lambda-tester' );
 
-var myHandler = require( '../handler' );
+var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -45,7 +45,7 @@ Additionally, if one wanted to test for failure, then the following code would b
 ```js
 var LambdaTester = require( 'lambda-tester' );
 
-var myHandler = require( '../handler' );
+var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -74,7 +74,7 @@ var LambdaTester = require( 'lambda-tester' );
 // your favorite validation tool here
 var expect = require( 'chai' ).expect;
 
-var myHandler = require( '../handler' );
+var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -102,7 +102,7 @@ var LambdaTester = require( 'lambda-tester' );
 // your favorite validation tool here
 var expect = require( 'chai' ).expect;
 
-var myHandler = require( '../handler' );
+var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
