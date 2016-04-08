@@ -1,16 +1,18 @@
 'use strict';
 
-var expect = require( 'chai' ).expect;
+const expect = require( 'chai' ).expect;
 
-var LambdaTester = require( '../../lib/index' );
+const sinon = require( 'sinon' );
 
-var LAMBDA_SIMPLE_SUCCEED = function( event, context ) { context.succeed( 'ok' ); };
+const LambdaTester = require( '../../lib/index' );
 
-var LAMBDA_SIMPLE_SUCCEED_DONE = function( event, context ) { context.done( null, 'ok' ); };
+const LAMBDA_SIMPLE_SUCCEED = function( event, context ) { context.succeed( 'ok' ); };
 
-var LAMBDA_SIMPLE_FAIL = function( event, context ) { context.fail( new Error( 'bang' ) ); };
+const LAMBDA_SIMPLE_SUCCEED_DONE = function( event, context ) { context.done( null, 'ok' ); };
 
-var LAMBDA_SIMPLE_FAIL_DONE = function( event, context ) { context.done( new Error( 'bang' ) ); };
+const LAMBDA_SIMPLE_FAIL = function( event, context ) { context.fail( new Error( 'bang' ) ); };
+
+const LAMBDA_SIMPLE_FAIL_DONE = function( event, context ) { context.done( new Error( 'bang' ) ); };
 
 describe( 'lib/index', function() {
 
@@ -87,24 +89,112 @@ describe( 'lib/index', function() {
 
                 var returnValue = tester.expectSucceed();
 
-                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( returnValue ).to.be.instanceof( Promise );
+                expect( returnValue.verify ).to.be.a( 'function' );
 
-                expect( tester.verifyOperation ).to.equal( 'succeed' );
-                expect( tester.resultVerifier ).to.not.exist;
+                return returnValue;
+            });
+
+            it( 'without verifier via context.done()', function() {
+
+                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED_DONE );
+
+                var returnValue = tester.expectSucceed();
+
+                expect( returnValue ).to.be.instanceof( Promise );
+                expect( returnValue.verify ).to.be.a( 'function' );
+
+                return returnValue;
             });
 
             it( 'with verifier', function() {
 
                 var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
-                var verifier = function( result ) {};
+                var verifier = sinon.stub();
 
                 var returnValue = tester.expectSucceed( verifier );
 
-                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( returnValue ).to.be.instanceof( Promise );
+                expect( returnValue.verify ).to.be.a( 'function' );
 
-                expect( tester.verifyOperation ).to.equal( 'succeed' );
-                expect( tester.resultVerifier ).to.equal( verifier );
+                return returnValue
+                    .then( function() {
+
+                        expect( verifier.calledOnce ).to.be.true;
+                        expect( verifier.withArgs( 'ok' ).calledOnce ).to.be.true;
+                    });
+            });
+
+            it( 'with .verify()', function() {
+
+                var done = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectSucceed()
+                    .verify( done )
+                    .then( function() {
+
+                        expect( done.calledOnce ).to.be.true;
+                        expect( done.withArgs().calledOnce ).to.be.true;
+                    });
+            })
+
+            it( 'with verifier that returns a promise', function() {
+
+                let value = 1;
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectSucceed( function( result ) {
+
+                        return Promise.resolve()
+                            .then( function() {
+
+                                return new Promise( function( resolve, reject ) {
+
+                                    setTimeout( function() { value++; resolve(); }, 10 );
+                                });
+                            });
+                    })
+                    .then( function() {
+
+                        expect( value ).to.equal( 2 );
+                    });
+            });
+
+            it( 'fail: when context.fail() is called', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .expectSucceed()
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not succeed' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.equal( 'encountered error but expected the handler to succeed' );
+                            expect( err.cause.message ).to.equal( 'bang' );
+                        });
+            });
+
+            it( 'fail: when verifier fails with .verify', function() {
+
+                var done = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectSucceed( function( result ) {
+
+                        throw new Error( 'bang' );
+                    })
+                    .verify( done )
+                    .then( function() {
+
+                            expect( done.calledOnce ).to.be.true;
+
+                            expect( done.firstCall.args[0] ).to.be.an( 'Error' );
+                        }
+                    );
             });
         });
 
@@ -112,225 +202,111 @@ describe( 'lib/index', function() {
 
             it( 'without verifier', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                var tester = LambdaTester( LAMBDA_SIMPLE_FAIL );
 
                 var returnValue = tester.expectFail();
 
-                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( returnValue ).to.be.instanceof( Promise );
+                expect( returnValue.verify ).to.be.a( 'function' );
 
-                expect( tester.verifyOperation ).to.equal( 'fail' );
-                expect( tester.resultVerifier ).to.not.exist;
+                return returnValue;
+            });
+
+            it( 'without verifier via context.done()', function() {
+
+                var tester = LambdaTester( LAMBDA_SIMPLE_FAIL_DONE );
+
+                var returnValue = tester.expectFail();
+
+                expect( returnValue ).to.be.instanceof( Promise );
+                expect( returnValue.verify ).to.be.a( 'function' );
+
+                return returnValue;
             });
 
             it( 'with verifier', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                var tester = LambdaTester( LAMBDA_SIMPLE_FAIL );
 
                 var verifier = function( err ) {};
 
                 var returnValue = tester.expectFail( verifier );
 
-                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( returnValue ).to.be.instanceof( Promise );
+                expect( returnValue.verify ).to.be.a( 'function' );
 
-                expect( tester.verifyOperation ).to.equal( 'fail' );
-                expect( tester.resultVerifier ).to.equal( verifier );
-            });
-        });
-
-        describe( '.verify', function() {
-
-            function createFailDone( expectedMessage, done ) {
-
-                return function( err ) {
-
-                    if( !err ) {
-
-                        return done( new Error( 'expecting failure message: ' + expectedMessage ) );
-                    }
-
-                    expect( err.message ).to.equal( expectedMessage );
-                    done();
-                }
-            }
-
-            it( 'verify event and context with expectSucceed()', function( done ) {
-
-                LambdaTester( function( event, context ) {
-
-                        expect( event ).to.eql( { one: 1, two: 'two', '3': 'three' } );
-
-                        expect( context.succeed ).to.be.a( 'function' );
-                        expect( context.fail ).to.be.a( 'function' );
-                        expect( context.done ).to.be.a( 'function' );
-
-                        context.done();
-                    })
-                    .event( { one: 1, two: 'two', '3': 'three' } )
-                    .expectSucceed()
-                    .verify( done );
+                return returnValue;
             });
 
-            it( 'verify event and context with expectFail()', function( done ) {
+            it( 'with .verify()', function() {
 
-                LambdaTester( function( event, context ) {
+                var done = sinon.stub();
 
-                        expect( event ).to.eql( { one: 1, two: 'two', '3': 'three' } );
-
-                        expect( context.succeed ).to.be.a( 'function' );
-                        expect( context.fail ).to.be.a( 'function' );
-                        expect( context.done ).to.be.a( 'function' );
-
-                        context.done( new Error( 'bang' ) );
-                    })
-                    .event( { one: 1, two: 'two', '3': 'three' } )
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .expectFail()
-                    .verify( done );
-            });
+                    .verify( done )
+                    .then( function() {
 
-            it( 'verify success with default event and no verifier', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectSucceed()
-                    .verify( done );
-            });
-
-            it( 'verify success with default event and no verifier, context.done()', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_SUCCEED_DONE )
-                    .expectSucceed()
-                    .verify( done );
-            });
-
-            it( 'verify success with default event and verifier', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectSucceed( function( result ) {
-
-                        expect( result ).to.equal( 'ok' );
-                    })
-                    .verify( done );
-            });
-
-            it( 'verify success with long running (500ms) handler', function( done ) {
-
-                LambdaTester( function( event, context ) {
-
-                        setTimeout( function() { context.succeed( 'ok'); }, 500 );
-                    })
-                    .expectSucceed( function( result ) {
-
-                        expect( result ).to.equal( 'ok' );
-                    })
-                    .verify( done );
-            });
-
-            it( 'verify fail with default event and no verifier', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_FAIL )
-                    .expectFail()
-                    .verify( done );
-            });
-
-            it( 'verify fail with default event and no verifier, context.done()', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_FAIL_DONE )
-                    .expectFail()
-                    .verify( done );
-            });
-
-            it( 'verify fail with default event and verifier', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_FAIL )
-                    .expectFail( function( err ) {
-
-                        expect( err ).to.be.an.instanceof( Error );
-                        expect( err.message ).to.equal( 'bang' );
-                    })
-                    .verify( done );
-            });
-
-            it( 'verify fail with long running (500ms) handler', function( done ) {
-
-                LambdaTester( function( event, context ) {
-
-                        setTimeout( function() { context.fail( new Error( 'not ok' ) ); }, 500 );
-                    })
-                    .expectFail( function( err ) {
-
-                        expect( err.message ).to.equal( 'not ok' );
-                    })
-                    .verify( done );
-            });
-
-            it( 'fail: default event, succeed expected, fail called, no verifier', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_FAIL )
-                    .expectSucceed()
-                    .verify( createFailDone( 'encountered error but expected the handler to succeed', done ) );
-            });
-
-            it( 'fail: default event, fail expected, succeed called, no verifier', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectFail()
-                    .verify( createFailDone( 'encountered successful operation but expected failure', done ) );
-            });
-
-            it( 'fail: default event, success expected, verifier fails', function( done ) {
-
-                LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectSucceed( function( result ) {
-
-                        expect( result ).to.equal( 'good' );
-                    })
-                    .verify( function( err )  {
-
-                        expect( err ).to.exist;
-                        expect( err.message ).to.equal( "expected 'ok' to equal 'good'" );
-
-                        done();
+                        expect( done.calledOnce ).to.be.true;
+                        expect( done.withArgs().calledOnce ).to.be.true;
                     });
             });
 
-            it( 'fail: default event, fail expected, verifier fails', function( done ) {
+            it( 'with verifier that returns a promise', function() {
 
-                LambdaTester( LAMBDA_SIMPLE_FAIL )
-                    .expectFail( function( err ) {
+                let value = 1;
 
-                        expect( err ).to.be.an.instanceof( Error );
-                        expect( err.message ).to.equal( 'error' );
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .expectFail( function( result ) {
+
+                        return Promise.resolve()
+                            .then( function() {
+
+                                return new Promise( function( resolve, reject ) {
+
+                                    setTimeout( function() { value++; resolve(); }, 10 );
+                                });
+                            });
                     })
-                    .verify( function( err )  {
+                    .then( function() {
 
-                        expect( err ).to.exist;
-                        expect( err.message ).to.equal( "expected 'bang' to equal 'error'" );
-
-                        done();
+                        expect( value ).to.equal( 2 );
                     });
             });
 
-            it( 'fail: done is not supplied', function() {
+            it( 'fail: when context.succeed() is called', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectSucceed();
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectFail()
+                    .then(
+                        function() {
 
-                expect( tester.verify.bind( tester ) ).to.throw( 'missing callback' );
+                            throw new Error( 'should not succeed' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.equal( 'encountered successful operation but expected failure' );
+                            expect( err.result ).to.equal( 'ok' );
+                        });
             });
 
-            it( 'fail: expectSucceed() or expectFail() not called', function() {
+            it( 'fail: when verifier fails with .verify', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                var done = sinon.stub();
 
-                expect( tester.verify.bind( tester, function( err ) {} ) ).to.throw( 'call expectSucceed() or expectFailure() before calling verify' );
-            });
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .expectFail( function( err ) {
 
-            it( 'fail: unknown verify operation', function() {
+                        throw new Error( 'boom' );
+                    })
+                    .verify( done )
+                    .then( function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                            expect( done.calledOnce ).to.be.true;
 
-                tester.verifyOperation = 'special';
-
-                expect( tester.verify.bind( tester, function( err ) {} ) ).to.throw( 'unknown operation: special' );
+                            expect( done.firstCall.args[0] ).to.be.an( 'Error' );
+                        }
+                    );
             });
         });
     });
