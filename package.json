@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Helps unit test AWS Lambda handlers",
   "main": "index.js",
   "keywords": [
@@ -10,6 +10,7 @@
     "mocha",
     "unit test"
   ],
+  "engines" : { "node" : ">=4.3.2" },
   "repository": {
     "type": "git",
     "url": "https://github.com/vandium-io/lambda-tester.git"
