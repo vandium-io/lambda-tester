@@ -7,16 +7,17 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 ## Features
 * Verifies correct handler behavior
 * Works asynchronously like Lambda does
+* Supports Promises
 * Easily integrates with test frameworks
 * No external dependencies
 * Lightweight and won't impact performance
-* Works with Node 0.10.36
+* Works with Node 4.3.2+
 
-## Installation 
+## Installation
 Install via npm.
 
 	npm install lambda-tester --save-dev
-	
+
 ## Getting Started
 
 The following example shows a simple case for validating that the Lambda (handler) was called successfully:
@@ -28,12 +29,11 @@ var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
-	it( 'test success', function( done /*important!*/ ) {
-		
-		LambdaTester( myHandler )
+	it( 'test success', function() {
+
+		return LambdaTester( myHandler )
 			.event( { name: 'Fred' } )
-			.expectSucceed()
-			.verify( done );
+			.expectSucceed();
 	});
 });
 ```
@@ -49,12 +49,11 @@ var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
-	it( 'test failure', function( done /*important!*/ ) {
-		
-		LambdaTester( myHandler )
+	it( 'test failure', function() {
+
+		return LambdaTester( myHandler )
 			.event( { name: 'Unknown' } )
-			.expectFail()
-			.verify( done );
+			.expectFail();
 	});
 });
 ```
@@ -78,16 +77,15 @@ var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
-	it( 'test success', function( done /*important!*/ ) {
-		
-		LambdaTester( myHandler )
+	it( 'test success', function() {
+
+		return LambdaTester( myHandler )
 			.event( { name: 'Fred' } )
 			.expectSucceed( function( result ) {
-			
+
 				expect( result.userId ).to.exist;
 				expect( result.user ).to.equal( 'fredsmith' );
-			})
-			.verify( done );
+			});
 	});
 });
 ```
@@ -106,15 +104,14 @@ var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
-	it( 'test success', function( done /*important!*/ ) {
-		
-		LambdaTester( myHandler )
+	it( 'test success', function() {
+
+		return LambdaTester( myHandler )
 			.event( { name: 'Unknown' } )
 			.expectFail( function( err ) {
-			
+
 				expect( err.message ).to.equal( 'User not found' );
-			})
-			.verify( done );
+			});
 	});
 });
 ```

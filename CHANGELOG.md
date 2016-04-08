@@ -1,3 +1,14 @@
+## 2.0.0 (TBD)
+
+New:
+* Support for Promises within verifier
+
+Improved:
+* No longer requires the 'done' callback from mocha. Expect handlers now return promises that can be resolved/rejected by mocha.
+
+Compatibility:
+* Node.js 4.3.2 or higher
+
 ## 1.0.1 (2016-04-03)
 
 Fixed:
