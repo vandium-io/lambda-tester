@@ -14,6 +14,12 @@ const LAMBDA_SIMPLE_FAIL = function( event, context ) { context.fail( new Error(
 
 const LAMBDA_SIMPLE_FAIL_DONE = function( event, context ) { context.done( new Error( 'bang' ) ); };
 
+const LAMBDA_SIMPLE_CALLBACK_ERROR = function( event, context, callback ) { callback( new Error( 'bang' ) ); };
+
+const LAMBDA_SIMPLE_CALLBACK = function( event, context, callback ) { callback( null, 'ok' ); };
+
+const LAMBDA_THROWS = function( event, context, callback ) { throw new Error( 'something happened!' ); };
+
 describe( 'lib/index', function() {
 
     describe( 'LambdaTester', function() {
@@ -196,6 +202,65 @@ describe( 'lib/index', function() {
                         }
                     );
             });
+
+            it( 'fail: when callback( null, result ) called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectSucceed( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should fail' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.equal( 'callback called' );
+                            expect( err.result ).to.equal( 'ok' );
+                        }
+                    );
+            });
+
+            it( 'fail: when callback( err ) called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
+                    .expectSucceed( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should fail' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.equal( 'callback called with error parameter' );
+                            expect( err.cause.message ).to.equal( 'bang' );
+                        }
+                    );
+            });
+
+            it( 'fail: when exception thrown inside handler', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_THROWS )
+                    .expectSucceed( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'something happened!' );
+                        }
+                    );
+            });
         });
 
         describe( '.expectFail', function() {
@@ -305,6 +370,269 @@ describe( 'lib/index', function() {
                             expect( done.calledOnce ).to.be.true;
 
                             expect( done.firstCall.args[0] ).to.be.an( 'Error' );
+                        }
+                    );
+            });
+            it( 'fail: when callback( null, result ) called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectFail( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should fail' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.equal( 'callback called' );
+                            expect( err.result ).to.equal( 'ok' );
+                        }
+                    );
+            });
+
+            it( 'fail: when callback( err ) called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
+                    .expectFail( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should fail' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.equal( 'callback called with error parameter' );
+                            expect( err.cause.message ).to.equal( 'bang' );
+                        }
+                    );
+            });
+
+            it( 'fail: when exception thrown inside handler', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_THROWS )
+                    .expectFail( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'something happened!' );
+                        }
+                    );
+            });
+        });
+
+        describe( '.expectError', function() {
+
+            it( 'without verifier', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
+                    .expectError();
+            });
+
+            it( 'with verifier', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
+                    .expectError( function( err ) {
+
+                        expect( err.message ).to.equal( 'bang' );
+                    });
+            });
+
+            it( 'fail: when context.fail() called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .expectError( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'context.fail() called before callback' );
+                        }
+                    );
+            });
+
+            it( 'fail: when context.succeed() called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectError( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'context.succeed() called before callback' );
+                        }
+                    );
+            });
+
+            it( 'fail: when callback( null, result ) called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectError( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'expecting error' );
+                            expect( err.result ).to.equal( 'ok' );
+                        }
+                    );
+            });
+
+            it( 'fail: when exception thrown inside handler', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_THROWS )
+                    .expectError( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'something happened!' );
+                        }
+                    );
+            });
+        });
+
+        describe( '.expectResult', function() {
+
+            it( 'without verifier', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult();
+            });
+
+            it( 'with verifier', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult( function( result ) {
+
+                        expect( result ).to.equal( 'ok' );
+                    });
+            });
+
+            it( 'fail: when context.fail() called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .expectResult( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'context.fail() called before callback' );
+                        }
+                    );
+            });
+
+            it( 'fail: when context.succeed() called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectResult( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'context.succeed() called before callback' );
+                        }
+                    );
+            });
+
+            it( 'fail: when callback( err ) called', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
+                    .expectResult( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'expecting result' );
+                        }
+                    );
+            });
+
+            it( 'fail: when exception thrown inside handler', function() {
+
+                var verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_THROWS )
+                    .expectResult( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'something happened!' );
                         }
                     );
             });
