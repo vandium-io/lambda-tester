@@ -18,6 +18,10 @@ Install via npm.
 
 	npm install lambda-tester --save-dev
 
+## Compatibility
+
+Version 2.0 targets Lambda handlers using Node 4.3.2. If you require support for Node 0.10.36 then use version 1.0.x.
+
 ## Getting Started
 
 The following example shows a simple case for validating that the Lambda (handler) was called successfully:
@@ -104,7 +108,7 @@ var myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
-	it( 'test success', function() {
+	it( 'test failure', function() {
 
 		return LambdaTester( myHandler )
 			.event( { name: 'Unknown' } )
@@ -130,7 +134,7 @@ exports.handler = function( event, context, callback ) {
 ```
 
 
-To verify that the callback was called with the error parameter:
+To verify that `callback( null, result )` was called:
 
 ```js
 var LambdaTester = require( 'lambda-tester' );
@@ -151,6 +155,30 @@ describe( 'handler', function() {
                 expect( result.userId ).to.exist;
                 expect( result.user ).to.equal( 'fredsmith' );
             });
+	});
+});
+```
+
+To verify that `callback( err )` was called:
+
+```js
+var LambdaTester = require( 'lambda-tester' );
+
+// your favorite validation tool here
+var expect = require( 'chai' ).expect;
+
+var myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test callback( err )', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Unknown' } )
+			.expectError( function( err ) {
+
+				expect( err.message ).to.equal( 'User not found' );
+			});
 	});
 });
 ```
