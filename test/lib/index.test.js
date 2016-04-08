@@ -22,14 +22,14 @@ describe( 'lib/index', function() {
 
                 var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
-                expect( tester ).to.be.an.instanceof( LambdaTester );
+                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
             });
 
             it( 'called with new', function() {
-                
+
                 var tester = new LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
-                expect( tester ).to.be.an.instanceof( LambdaTester );
+                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
             });
 
             it( 'fail: called without handler, without calling new', function() {
@@ -62,12 +62,12 @@ describe( 'lib/index', function() {
 
                 var returnValue = tester.event( { one: 1 } );
 
-                expect( returnValue ).to.be.an.instanceof( LambdaTester );
+                expect( returnValue ).to.equal( tester );
                 expect( tester._event ).to.eql( { one: 1 } );
 
                 returnValue = tester.event( { two: 2 } );
 
-                expect( returnValue ).to.be.an.instanceof( LambdaTester );
+                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
                 expect( tester._event ).to.eql( { two: 2 } );
             });
 
@@ -86,8 +86,8 @@ describe( 'lib/index', function() {
                 var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 var returnValue = tester.expectSucceed();
-                
-                expect( returnValue ).to.be.an.instanceof( LambdaTester );
+
+                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
 
                 expect( tester.verifyOperation ).to.equal( 'succeed' );
                 expect( tester.resultVerifier ).to.not.exist;
@@ -100,8 +100,8 @@ describe( 'lib/index', function() {
                 var verifier = function( result ) {};
 
                 var returnValue = tester.expectSucceed( verifier );
-                
-                expect( returnValue ).to.be.an.instanceof( LambdaTester );
+
+                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
 
                 expect( tester.verifyOperation ).to.equal( 'succeed' );
                 expect( tester.resultVerifier ).to.equal( verifier );
@@ -109,14 +109,14 @@ describe( 'lib/index', function() {
         });
 
         describe( '.expectFail', function() {
-            
+
             it( 'without verifier', function() {
 
                 var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 var returnValue = tester.expectFail();
-                
-                expect( returnValue ).to.be.an.instanceof( LambdaTester );
+
+                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
 
                 expect( tester.verifyOperation ).to.equal( 'fail' );
                 expect( tester.resultVerifier ).to.not.exist;
@@ -129,8 +129,8 @@ describe( 'lib/index', function() {
                 var verifier = function( err ) {};
 
                 var returnValue = tester.expectFail( verifier );
-                
-                expect( returnValue ).to.be.an.instanceof( LambdaTester );
+
+                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
 
                 expect( tester.verifyOperation ).to.equal( 'fail' );
                 expect( tester.resultVerifier ).to.equal( verifier );
@@ -330,7 +330,7 @@ describe( 'lib/index', function() {
 
                 tester.verifyOperation = 'special';
 
-                expect( tester.verify.bind( tester, function( err ) {} ) ).to.throw( 'unknown operation: special' );                                
+                expect( tester.verify.bind( tester, function( err ) {} ) ).to.throw( 'unknown operation: special' );
             });
         });
     });
