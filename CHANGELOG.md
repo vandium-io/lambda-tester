@@ -1,7 +1,8 @@
-## 2.0.0 (TBD)
+## 2.0.0 (2016-04-09)
 
 New:
-* Support for Promises within verifier
+* Can now use Promises within verifiers
+* Supports Lambda Callbacks
 
 Improved:
 * No longer requires the 'done' callback from mocha. Expect handlers now return promises that can be resolved/rejected by mocha.

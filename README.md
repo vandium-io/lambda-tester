@@ -60,7 +60,7 @@ describe( 'handler', function() {
 
 As with the "succeed" example, if the handler calls `context.succeed()` or `context.done( null, result )` then the test will fail.
 
-Please note that a `done` callback is *required* since use an asynchronous mechanism to report success or failure.
+Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises.
 
 ## Verifying Success
 
@@ -112,6 +112,45 @@ describe( 'handler', function() {
 
 				expect( err.message ).to.equal( 'User not found' );
 			});
+	});
+});
+```
+
+## Verifying Lambda Callbacks
+
+On April 8, 2016 AWS Lambda introduced support for Lambda callbacks that replace the need to call `context.fail()` or `context.succeed()`.
+
+Lambda handlers with support for callbacks use the typical Node.js asynchronous signature:
+
+```js
+exports.handler = function( event, context, callback ) {
+
+    callback( null, 'success!' );
+}
+```
+
+
+To verify that the callback was called with the error parameter:
+
+```js
+var LambdaTester = require( 'lambda-tester' );
+
+// your favorite validation tool here
+var expect = require( 'chai' ).expect;
+
+var myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test callback( null, result )', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Fred' } )
+			.expectResult( function( result ) {
+
+                expect( result.userId ).to.exist;
+                expect( result.user ).to.equal( 'fredsmith' );
+            });
 	});
 });
 ```
