@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Helps unit test AWS Lambda handlers",
   "main": "index.js",
   "keywords": [
@@ -8,7 +8,8 @@
     "Lambda",
     "test",
     "mocha",
-    "unit test"
+    "unit test",
+    "serverless"
   ],
   "engines": {
     "node": ">=4.3.2"

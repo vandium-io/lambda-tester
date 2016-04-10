@@ -9,8 +9,8 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Works asynchronously like Lambda does
 * Supports Promises
 * Easily integrates with test frameworks
-* No external dependencies
 * Lightweight and won't impact performance
+* Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
 * Works with Node 4.3.2+
 
 ## Installation
@@ -18,13 +18,20 @@ Install via npm.
 
 	npm install lambda-tester --save-dev
 
-## Compatibility
-
-Version 2.0 targets Lambda handlers using Node 4.3.2. If you require support for Node 0.10.36 then use version 1.0.x.
 
 ## Getting Started
 
-The following example shows a simple case for validating that the Lambda (handler) was called successfully:
+Lambda handlers with support for callbacks use the typical Node.js asynchronous signature:
+
+```js
+exports.handler = function( event, context, callback ) {
+
+    callback( null, 'success!' );
+}
+```
+
+
+The following example shows a simple case for validating that the Lambda (handler) was called successfully (i.e. `callback( null, result )`:
 
 ```js
 var LambdaTester = require( 'lambda-tester' );
@@ -37,12 +44,12 @@ describe( 'handler', function() {
 
 		return LambdaTester( myHandler )
 			.event( { name: 'Fred' } )
-			.expectSucceed();
+			.expectResult();
 	});
 });
 ```
 
-If the handler decides to call `context.fail()` or `context.done( err )` then the verification will fail and the test will fail.
+If the handler decides to call `callback( err )` then the verification will fail and the test will fail.
 
 Additionally, if one wanted to test for failure, then the following code would be used:
 
@@ -57,81 +64,15 @@ describe( 'handler', function() {
 
 		return LambdaTester( myHandler )
 			.event( { name: 'Unknown' } )
-			.expectFail();
+			.expectError();
 	});
 });
 ```
-
-As with the "succeed" example, if the handler calls `context.succeed()` or `context.done( null, result )` then the test will fail.
 
 Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises.
 
-## Verifying Success
 
-When `expectSucceed()` is called, one can pass a function to perform additional validation. For example:
-
-
-```js
-var LambdaTester = require( 'lambda-tester' );
-
-// your favorite validation tool here
-var expect = require( 'chai' ).expect;
-
-var myHandler = require( '../index' ).handler;
-
-describe( 'handler', function() {
-
-	it( 'test success', function() {
-
-		return LambdaTester( myHandler )
-			.event( { name: 'Fred' } )
-			.expectSucceed( function( result ) {
-
-				expect( result.userId ).to.exist;
-				expect( result.user ).to.equal( 'fredsmith' );
-			});
-	});
-});
-```
-
-## Verifying Failure
-
-As with verifying success, `expectFail` has an optional parameter that can specify a function that will verify the error condition. For example:
-
-```js
-var LambdaTester = require( 'lambda-tester' );
-
-// your favorite validation tool here
-var expect = require( 'chai' ).expect;
-
-var myHandler = require( '../index' ).handler;
-
-describe( 'handler', function() {
-
-	it( 'test failure', function() {
-
-		return LambdaTester( myHandler )
-			.event( { name: 'Unknown' } )
-			.expectFail( function( err ) {
-
-				expect( err.message ).to.equal( 'User not found' );
-			});
-	});
-});
-```
-
-## Verifying Lambda Callbacks
-
-On April 8, 2016 AWS Lambda introduced support for Lambda callbacks that replace the need to call `context.fail()` or `context.succeed()`.
-
-Lambda handlers with support for callbacks use the typical Node.js asynchronous signature:
-
-```js
-exports.handler = function( event, context, callback ) {
-
-    callback( null, 'success!' );
-}
-```
+## Verifying Callbacks
 
 
 To verify that `callback( null, result )` was called:
@@ -183,9 +124,108 @@ describe( 'handler', function() {
 });
 ```
 
+## Detecting Handlers than Run for Too Long
+
+For Lambda handlers that must run within a specific time period, you can specify a timeout value. This value will not stop execution of your code, but will detect an error condition.
+
+To use the timeout feature, specify a timeout value in seconds using `timeout()` as in the example below:
+
+```js
+var LambdaTester = require( 'lambda-tester' );
+
+// your favorite validation tool here
+var expect = require( 'chai' ).expect;
+
+var myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test callback( null, result )', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Fred' } )
+			.timeout( 1 /* fail if longer than 1 second */ )
+			.expectResult( function( result ) {
+
+                expect( result.userId ).to.exist;
+                expect( result.user ).to.equal( 'fredsmith' );
+            });
+	});
+});
+```
+
+## Verifying `context.succeed()`, `context.fail` and `context.done()`
+
+On April 8, 2016 AWS Lambda introduced support for Lambda callbacks that replace the need to call `context.fail()` or `context.succeed()`.
+
+### Verifying `context.succeed()`
+
+When `expectSucceed()` is called, one can pass a function to perform additional validation. For example:
+
+
+```js
+var LambdaTester = require( 'lambda-tester' );
+
+// your favorite validation tool here
+var expect = require( 'chai' ).expect;
+
+var myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test success', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Fred' } )
+			.expectSucceed( function( result ) {
+
+				expect( result.userId ).to.exist;
+				expect( result.user ).to.equal( 'fredsmith' );
+			});
+	});
+});
+```
+
+### Verifying `context.fail()`
+
+As with verifying success, `expectFail` has an optional parameter that can specify a function that will verify the error condition. For example:
+
+```js
+var LambdaTester = require( 'lambda-tester' );
+
+// your favorite validation tool here
+var expect = require( 'chai' ).expect;
+
+var myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test failure', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Unknown' } )
+			.expectFail( function( err ) {
+
+				expect( err.message ).to.equal( 'User not found' );
+			});
+	});
+});
+```
+
+### Verifying `context.done()`
+
+AWS Lambda routes `context.done()` to `context.succed()` and `context.fail()` for results or errors respectively, thus you can use the methods described above to verify those scenarios.
+
+
 ## Feedback
 
 We'd love to get feedback on how to make this tool better. Feel free to contact us at `feedback@vandium.io`
+
+
+## Compatibility
+
+Version 2.0 targets Lambda handlers using Node 4.3.2. If you require support for Node 0.10.36 then use version 1.0.x.
+
 
 ## License
 
