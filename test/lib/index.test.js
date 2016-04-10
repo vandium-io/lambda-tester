@@ -1,26 +1,114 @@
 'use strict';
 
+/*jshint expr: true*/
+
 const expect = require( 'chai' ).expect;
 
 const sinon = require( 'sinon' );
 
+const fs = require( 'fs' );
+
 const LambdaTester = require( '../../lib/index' );
 
-const LAMBDA_SIMPLE_SUCCEED = function( event, context ) { context.succeed( 'ok' ); };
+const LAMBDA_LONG_TIMEOUT = 1100;
 
-const LAMBDA_SIMPLE_SUCCEED_DONE = function( event, context ) { context.done( null, 'ok' ); };
+const LAMBDA_SIMPLE_SUCCEED = function( event, context ) {
 
-const LAMBDA_SIMPLE_FAIL = function( event, context ) { context.fail( new Error( 'bang' ) ); };
+    context.succeed( 'ok' );
+};
 
-const LAMBDA_SIMPLE_FAIL_DONE = function( event, context ) { context.done( new Error( 'bang' ) ); };
+const LAMBDA_SIMPLE_SUCCEED_DONE = function( event, context ) {
 
-const LAMBDA_SIMPLE_CALLBACK_ERROR = function( event, context, callback ) { callback( new Error( 'bang' ) ); };
+    context.done( null, 'ok' );
+};
 
-const LAMBDA_SIMPLE_CALLBACK = function( event, context, callback ) { callback( null, 'ok' ); };
+const LAMBDA_SUCCEED_LONG = function( event, context, callback ) {
 
-const LAMBDA_THROWS = function( event, context, callback ) { throw new Error( 'something happened!' ); };
+    setTimeout( function() {
+
+            context.succeed( 'ok' );
+        }, LAMBDA_LONG_TIMEOUT );
+}
+
+const LAMBDA_SIMPLE_FAIL = function( event, context ) {
+
+    context.fail( new Error( 'bang' ) );
+};
+
+const LAMBDA_SIMPLE_FAIL_DONE = function( event, context ) {
+
+    context.done( new Error( 'bang' ) );
+};
+
+const LAMBDA_FAIL_LONG = function( event, context, callback ) {
+
+    setTimeout( function() {
+
+            context.fail( new Error( 'bang' ) );
+        }, LAMBDA_LONG_TIMEOUT );
+}
+
+
+const LAMBDA_SIMPLE_CALLBACK_ERROR = function( event, context, callback ) {
+
+    callback( new Error( 'bang' ) );
+};
+
+const LAMBDA_CALLBACK_ERROR_LONG = function( event, context, callback ) {
+
+    setTimeout( function() {
+
+            callback( new Error( 'bang' ) );
+        }, LAMBDA_LONG_TIMEOUT );
+}
+
+const LAMBDA_SIMPLE_CALLBACK = function( event, context, callback ) {
+
+    callback( null, 'ok' );
+};
+
+const LAMBDA_CALLBACK_LONG = function( event, context, callback ) {
+
+    if( context.getRemainingTimeInMillis() === 0 ) {
+
+        throw new Error( 'getRemainingTimeInMillis() is not working' );
+    }
+
+    setTimeout( function() {
+
+            if( context.getRemainingTimeInMillis() !== 0 ) {
+
+                return callback( new Error( 'remaining time should be 0' ) );
+            }
+
+            callback( null, 'ok' );
+        }, LAMBDA_LONG_TIMEOUT );
+}
+
+const LAMBDA_THROWS = function( event, context, callback ) {
+
+    throw new Error( 'something happened!' );
+};
+
 
 describe( 'lib/index', function() {
+
+    describe( 'environment variables', function() {
+
+        it( 'LAMBDA_TASK_ROOT', function() {
+
+            expect( process.env.LAMBDA_TASK_ROOT ).to.exist;
+
+            var path = require( 'app-root-path' ).toString();
+
+            expect( process.env.LAMBDA_TASK_ROOT ).to.equal( path );
+
+            // should be our root - let's try to get our package.json
+            let stats = fs.statSync( process.env.LAMBDA_TASK_ROOT + '/package.json' );
+
+            expect( stats.isFile() ).to.be.true;
+        });
+    });
 
     describe( 'LambdaTester', function() {
 
@@ -99,6 +187,13 @@ describe( 'lib/index', function() {
                 expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue;
+            });
+
+            it( 'without verifier and timeout', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .timeout( 1 )
+                    .expectSucceed();
             });
 
             it( 'without verifier via context.done()', function() {
@@ -261,6 +356,25 @@ describe( 'lib/index', function() {
                         }
                     );
             });
+
+            it( 'fail: when time exceeds allocated time', function() {
+
+                this.timeout( LAMBDA_LONG_TIMEOUT + 500 );
+
+                return LambdaTester( LAMBDA_SUCCEED_LONG )
+                    .timeout( 1 )
+                    .expectSucceed()
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.contain( 'handler timed out - execution time:' );
+                        }
+                    );
+            });
         });
 
         describe( '.expectFail', function() {
@@ -275,6 +389,13 @@ describe( 'lib/index', function() {
                 expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue;
+            });
+
+            it( 'without verifier and timeout', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .timeout( 1 )
+                    .expectFail();
             });
 
             it( 'without verifier via context.done()', function() {
@@ -431,6 +552,25 @@ describe( 'lib/index', function() {
                         }
                     );
             });
+
+            it( 'fail: when time exceeds allocated time', function() {
+
+                this.timeout( LAMBDA_LONG_TIMEOUT + 500 );
+
+                return LambdaTester( LAMBDA_FAIL_LONG )
+                    .timeout( 1 )
+                    .expectFail()
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.contain( 'handler timed out - execution time:' );
+                        }
+                    );
+            });
         });
 
         describe( '.expectError', function() {
@@ -438,6 +578,13 @@ describe( 'lib/index', function() {
             it( 'without verifier', function() {
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
+                    .expectError();
+            });
+
+            it( 'without verifier and timeout', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
+                    .timeout( 1 )
                     .expectError();
             });
 
@@ -534,6 +681,25 @@ describe( 'lib/index', function() {
                         }
                     );
             });
+
+            it( 'fail: when time exceeds allocated time', function() {
+
+                this.timeout( LAMBDA_LONG_TIMEOUT + 500 );
+
+                return LambdaTester( LAMBDA_CALLBACK_ERROR_LONG )
+                    .timeout( 1 )
+                    .expectError()
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.contain( 'handler timed out - execution time:' );
+                        }
+                    );
+            });
         });
 
         describe( '.expectResult', function() {
@@ -541,6 +707,13 @@ describe( 'lib/index', function() {
             it( 'without verifier', function() {
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult();
+            });
+
+            it( 'without verifier and timeout', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .timeout( 1 )
                     .expectResult();
             });
 
@@ -633,6 +806,25 @@ describe( 'lib/index', function() {
                             expect( verifier.called ).to.be.false;
 
                             expect( err.message ).to.equal( 'something happened!' );
+                        }
+                    );
+            });
+
+            it( 'fail: when time exceeds allocated time', function() {
+
+                this.timeout( LAMBDA_LONG_TIMEOUT + 500 );
+
+                return LambdaTester( LAMBDA_CALLBACK_LONG )
+                    .timeout( 1 )
+                    .expectResult()
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.contain( 'handler timed out - execution time:' );
                         }
                     );
             });
