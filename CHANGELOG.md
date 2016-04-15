@@ -1,3 +1,9 @@
+## 2.2.0 (TBD)
+
+New:
+
+* Detects resources that might still be open and cause the Lambda handler to run longer than anticipated
+
 ## 2.1.0 (2016-04-10)
 
 New:
