@@ -115,7 +115,7 @@ describe( 'lib/index', function() {
         beforeEach( function() {
 
             // make sure leak detection is enabled by default
-            LambdaTester.checkForHandleLeak( true );
+            LambdaTester.checkForResourceLeak( true );
         });
 
         describe( 'constructor', function() {
@@ -269,9 +269,9 @@ describe( 'lib/index', function() {
                     });
             });
 
-            it( 'Resource leak but checkForHandleLeak is disabled', function() {
+            it( 'Resource leak but checkForResourceLeak is disabled', function() {
 
-                LambdaTester.checkForHandleLeak( false );
+                LambdaTester.checkForResourceLeak( false );
 
                 return LambdaTester( function( event, context, callback) {
 
