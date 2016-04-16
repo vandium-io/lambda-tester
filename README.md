@@ -7,6 +7,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 ## Features
 * Verifies correct handler behavior
 * Works asynchronously like Lambda does
+* Detects resource leaks
 * Supports Promises
 * Easily integrates with test frameworks
 * Lightweight and won't impact performance
@@ -34,9 +35,9 @@ exports.handler = function( event, context, callback ) {
 The following example shows a simple case for validating that the Lambda (handler) was called successfully (i.e. `callback( null, result )`:
 
 ```js
-var LambdaTester = require( 'lambda-tester' );
+const LambdaTester = require( 'lambda-tester' );
 
-var myHandler = require( '../index' ).handler;
+const myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -54,9 +55,9 @@ If the handler decides to call `callback( err )` then the verification will fail
 Additionally, if one wanted to test for failure, then the following code would be used:
 
 ```js
-var LambdaTester = require( 'lambda-tester' );
+const LambdaTester = require( 'lambda-tester' );
 
-var myHandler = require( '../index' ).handler;
+const myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -78,12 +79,12 @@ Please note that you must return the `LambdaTester` back to the framework since 
 To verify that `callback( null, result )` was called:
 
 ```js
-var LambdaTester = require( 'lambda-tester' );
+const LambdaTester = require( 'lambda-tester' );
 
 // your favorite validation tool here
-var expect = require( 'chai' ).expect;
+const expect = require( 'chai' ).expect;
 
-var myHandler = require( '../index' ).handler;
+const myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -103,12 +104,12 @@ describe( 'handler', function() {
 To verify that `callback( err )` was called:
 
 ```js
-var LambdaTester = require( 'lambda-tester' );
+const LambdaTester = require( 'lambda-tester' );
 
 // your favorite validation tool here
-var expect = require( 'chai' ).expect;
+const expect = require( 'chai' ).expect;
 
-var myHandler = require( '../index' ).handler;
+const myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -131,12 +132,12 @@ For Lambda handlers that must run within a specific time period, you can specify
 To use the timeout feature, specify a timeout value in seconds using `timeout()` as in the example below:
 
 ```js
-var LambdaTester = require( 'lambda-tester' );
+const LambdaTester = require( 'lambda-tester' );
 
 // your favorite validation tool here
-var expect = require( 'chai' ).expect;
+const expect = require( 'chai' ).expect;
 
-var myHandler = require( '../index' ).handler;
+const myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -164,12 +165,12 @@ When `expectSucceed()` is called, one can pass a function to perform additional 
 
 
 ```js
-var LambdaTester = require( 'lambda-tester' );
+const LambdaTester = require( 'lambda-tester' );
 
 // your favorite validation tool here
-var expect = require( 'chai' ).expect;
+const expect = require( 'chai' ).expect;
 
-var myHandler = require( '../index' ).handler;
+const myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -191,12 +192,12 @@ describe( 'handler', function() {
 As with verifying success, `expectFail` has an optional parameter that can specify a function that will verify the error condition. For example:
 
 ```js
-var LambdaTester = require( 'lambda-tester' );
+const LambdaTester = require( 'lambda-tester' );
 
 // your favorite validation tool here
-var expect = require( 'chai' ).expect;
+const expect = require( 'chai' ).expect;
 
-var myHandler = require( '../index' ).handler;
+const myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
@@ -216,15 +217,26 @@ describe( 'handler', function() {
 
 AWS Lambda routes `context.done()` to `context.succed()` and `context.fail()` for results or errors respectively, thus you can use the methods described above to verify those scenarios.
 
+## Resource Leak detection
+
+Resource leaks (i.e. streams and other callback events like timers) are detected and reported by default.
+
+To disable leak detection:
+
+```js
+const LambdaTester = require( 'lambda-tester' );
+
+LambdaTester.checkForResourceLeak( false );
+```
 
 ## Feedback
 
-We'd love to get feedback on how to make this tool better. Feel free to contact us at `feedback@vandium.io`
+We'd love to get feedback on how you're using lambda-tester and things we could add to make this tool better. Feel free to contact us at `feedback@vandium.io`
 
 
 ## Compatibility
 
-Version 2.0 targets Lambda handlers using Node 4.3.2. If you require support for Node 0.10.36 then use version 1.0.x.
+Version 2.x targets Lambda handlers using Node 4.3.2. If you require support for Node 0.10.36 then use version 1.0.x.
 
 
 ## License
