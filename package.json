@@ -1,14 +1,18 @@
 {
   "name": "lambda-tester",
-  "version": "2.1.0",
-  "description": "Helps unit test AWS Lambda handlers",
+  "version": "2.2.0",
+  "description": "Unit/Integration tests for AWS Lambda handlers",
   "main": "index.js",
   "keywords": [
     "AWS",
     "Lambda",
     "test",
     "mocha",
+    "TDD",
     "unit test",
+    "unit testing",
+    "integration test",
+    "integration testing",
     "serverless"
   ],
   "engines": {
