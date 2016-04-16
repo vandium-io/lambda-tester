@@ -99,7 +99,7 @@ describe( 'lib/index', function() {
 
             expect( process.env.LAMBDA_TASK_ROOT ).to.exist;
 
-            var path = require( 'app-root-path' ).toString();
+            let path = require( 'app-root-path' ).toString();
 
             expect( process.env.LAMBDA_TASK_ROOT ).to.equal( path );
 
@@ -112,18 +112,24 @@ describe( 'lib/index', function() {
 
     describe( 'LambdaTester', function() {
 
+        beforeEach( function() {
+
+            // make sure leak detection is enabled by default
+            LambdaTester.checkForHandleLeak( true );
+        });
+
         describe( 'constructor', function() {
 
             it( 'called without new', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 expect( tester.constructor.name ).to.equal( 'LambdaTester' );
             });
 
             it( 'called with new', function() {
 
-                var tester = new LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                let tester = new LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 expect( tester.constructor.name ).to.equal( 'LambdaTester' );
             });
@@ -152,11 +158,11 @@ describe( 'lib/index', function() {
 
             it( 'normal operation', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 expect( tester._event ).to.eql( {} );
 
-                var returnValue = tester.event( { one: 1 } );
+                let returnValue = tester.event( { one: 1 } );
 
                 expect( returnValue ).to.equal( tester );
                 expect( tester._event ).to.eql( { one: 1 } );
@@ -169,7 +175,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: event missing', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 expect( tester.event.bind( tester ) ).to.throw( 'missing event' );
             });
@@ -179,9 +185,9 @@ describe( 'lib/index', function() {
 
             it( 'without verifier', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
-                var returnValue = tester.expectSucceed();
+                let returnValue = tester.expectSucceed();
 
                 expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
@@ -198,9 +204,9 @@ describe( 'lib/index', function() {
 
             it( 'without verifier via context.done()', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED_DONE );
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED_DONE );
 
-                var returnValue = tester.expectSucceed();
+                let returnValue = tester.expectSucceed();
 
                 expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
@@ -210,11 +216,11 @@ describe( 'lib/index', function() {
 
             it( 'with verifier', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
-                var returnValue = tester.expectSucceed( verifier );
+                let returnValue = tester.expectSucceed( verifier );
 
                 expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
@@ -229,7 +235,7 @@ describe( 'lib/index', function() {
 
             it( 'with .verify()', function() {
 
-                var done = sinon.stub();
+                let done = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
                     .expectSucceed()
@@ -263,6 +269,22 @@ describe( 'lib/index', function() {
                     });
             });
 
+            it( 'Resource leak but checkForHandleLeak is disabled', function() {
+
+                LambdaTester.checkForHandleLeak( false );
+
+                return LambdaTester( function( event, context, callback) {
+
+                        setTimeout( function() {}, 100 );
+
+                        callback( null, 'ok' );
+                    })
+                    .expectResult( function( result ) {
+
+                        expect( result ).to.equal( 'ok' );
+                    });
+            });
+
             it( 'fail: when context.fail() is called', function() {
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
@@ -281,10 +303,10 @@ describe( 'lib/index', function() {
 
             it( 'fail: when verifier fails with .verify', function() {
 
-                var done = sinon.stub();
+                let done = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectSucceed( function( result ) {
+                    .expectSucceed( function() {
 
                         throw new Error( 'bang' );
                     })
@@ -300,7 +322,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when callback( null, result ) called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectSucceed( verifier )
@@ -319,7 +341,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when callback( err ) called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
                     .expectSucceed( verifier )
@@ -338,7 +360,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when exception thrown inside handler', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_THROWS )
                     .expectSucceed( verifier )
@@ -375,15 +397,36 @@ describe( 'lib/index', function() {
                         }
                     );
             });
+
+            it( 'fail: when resource leak is detected', function() {
+
+                return LambdaTester( function( event, context, callback) {
+
+                        setTimeout( function() {}, 100 );
+
+                        callback( null, 'ok' );
+                    })
+                    .expectResult( function() {
+
+                        throw new Error( 'should not succeed' );
+                    })
+                    .catch( function( err ) {
+
+                        expect( err.message ).to.equal( 'Potential handle leakage detected' );
+
+                        expect( err.handles ).to.exist;
+                        expect( err.handles.length ).to.be.at.least( 1 );
+                    });
+            });
         });
 
         describe( '.expectFail', function() {
 
             it( 'without verifier', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_FAIL );
+                let tester = LambdaTester( LAMBDA_SIMPLE_FAIL );
 
-                var returnValue = tester.expectFail();
+                let returnValue = tester.expectFail();
 
                 expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
@@ -400,9 +443,9 @@ describe( 'lib/index', function() {
 
             it( 'without verifier via context.done()', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_FAIL_DONE );
+                let tester = LambdaTester( LAMBDA_SIMPLE_FAIL_DONE );
 
-                var returnValue = tester.expectFail();
+                let returnValue = tester.expectFail();
 
                 expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
@@ -412,11 +455,11 @@ describe( 'lib/index', function() {
 
             it( 'with verifier', function() {
 
-                var tester = LambdaTester( LAMBDA_SIMPLE_FAIL );
+                let tester = LambdaTester( LAMBDA_SIMPLE_FAIL );
 
-                var verifier = function( err ) {};
+                let verifier = function( err ) {};
 
-                var returnValue = tester.expectFail( verifier );
+                let returnValue = tester.expectFail( verifier );
 
                 expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
@@ -426,7 +469,7 @@ describe( 'lib/index', function() {
 
             it( 'with .verify()', function() {
 
-                var done = sinon.stub();
+                let done = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .expectFail()
@@ -478,7 +521,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when verifier fails with .verify', function() {
 
-                var done = sinon.stub();
+                let done = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .expectFail( function( err ) {
@@ -496,7 +539,7 @@ describe( 'lib/index', function() {
             });
             it( 'fail: when callback( null, result ) called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectFail( verifier )
@@ -515,7 +558,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when callback( err ) called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
                     .expectFail( verifier )
@@ -534,7 +577,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when exception thrown inside handler', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_THROWS )
                     .expectFail( verifier )
@@ -599,7 +642,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when context.fail() called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .expectError( verifier )
@@ -620,7 +663,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when context.succeed() called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
                     .expectError( verifier )
@@ -641,7 +684,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when callback( null, result ) called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectError( verifier )
@@ -663,7 +706,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when exception thrown inside handler', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_THROWS )
                     .expectError( verifier )
@@ -728,7 +771,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when context.fail() called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .expectResult( verifier )
@@ -749,7 +792,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when context.succeed() called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
                     .expectResult( verifier )
@@ -770,7 +813,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when callback( err ) called', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
                     .expectResult( verifier )
@@ -791,7 +834,7 @@ describe( 'lib/index', function() {
 
             it( 'fail: when exception thrown inside handler', function() {
 
-                var verifier = sinon.stub();
+                let verifier = sinon.stub();
 
                 return LambdaTester( LAMBDA_THROWS )
                     .expectResult( verifier )
