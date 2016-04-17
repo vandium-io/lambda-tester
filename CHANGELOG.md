@@ -1,6 +1,6 @@
 ## 2.2.0 (TBD)
 
-New:
+Experimental:
 
 * Detects resources that might still be open and cause the Lambda handler to run longer than anticipated
 
