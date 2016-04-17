@@ -1,3 +1,11 @@
 test
 
+test-other
+
 coverage
+
+.travis.yml
+
+.jshintrc
+
+.istanbul.yml
