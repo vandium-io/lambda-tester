@@ -285,6 +285,23 @@ describe( 'lib/index', function() {
                     });
             });
 
+            it( 'Prevent false positive leak detection on timer events', function() {
+
+                LambdaTester.checkForResourceLeak( false );
+
+                return LambdaTester( function( event, context, callback) {
+
+                        setTimeout( function() {
+
+                            callback( null, 'ok' );
+                        }, 100 );
+                    })
+                    .expectResult( function( result ) {
+
+                        expect( result ).to.equal( 'ok' );
+                    });
+            });
+
             it( 'fail: when context.fail() is called', function() {
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
@@ -416,6 +433,9 @@ describe( 'lib/index', function() {
 
                         expect( err.handles ).to.exist;
                         expect( err.handles.length ).to.be.at.least( 1 );
+
+                        // our timer
+                        expect( err.handles[0].msecs ).to.equal( 100 );
                     });
             });
         });
