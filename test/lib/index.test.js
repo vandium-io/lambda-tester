@@ -415,7 +415,7 @@ describe( 'lib/index', function() {
                     );
             });
 
-            it( 'fail: when resource leak is detected', function() {
+            it( 'fail: when a resource leak is detected from a timer', function() {
 
                 return LambdaTester( function( event, context, callback) {
 
