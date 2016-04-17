@@ -1,3 +1,9 @@
+## 2.2.1 (2016-04-17)
+
+Fixed:
+
+ * npm publish issue
+
 ## 2.2.0 (2016-04-17)
 
 Experimental:
