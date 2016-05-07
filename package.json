@@ -1,8 +1,8 @@
 {
   "name": "lambda-tester",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Unit/Integration tests for AWS Lambda handlers",
-  "main": "index.js",
+  "main": "lib/index.js",
   "keywords": [
     "AWS",
     "Lambda",
@@ -13,7 +13,9 @@
     "unit testing",
     "integration test",
     "integration testing",
-    "serverless"
+    "serverless",
+    "environment",
+    "variables"
   ],
   "engines": {
     "node": ">=4.3.2"
@@ -35,6 +37,7 @@
     "sinon": "^1.17.3"
   },
   "dependencies": {
-    "app-root-path": "^1.0.0"
+    "app-root-path": "^1.0.0",
+    "dotenv": "^2.0.0"
   }
 }
