@@ -134,23 +134,12 @@ describe( 'lib/index', function() {
                 expect( tester.constructor.name ).to.equal( 'LambdaTester' );
             });
 
-            it( 'fail: called without handler, without calling new', function() {
+            it( 'called without handler', function() {
 
-                expect( LambdaTester.bind() ).to.throw( 'missing handler' );
-            });
+                let tester = new LambdaTester();
 
-            it( 'fail: called without handler, called with new', function() {
-
-                try {
-
-                    new LambdaTester();
-
-                    throw new Error( 'should not get here' );
-                }
-                catch( err ) {
-
-                    expect( err.message ).to.equal( 'missing handler' );
-                }
+                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( tester._handler ).to.not.exist;
             });
         });
 
@@ -252,12 +241,12 @@ describe( 'lib/index', function() {
                 let value = 1;
 
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectSucceed( function( result ) {
+                    .expectSucceed( function( /*result*/ ) {
 
                         return Promise.resolve()
                             .then( function() {
 
-                                return new Promise( function( resolve, reject ) {
+                                return new Promise( function( resolve /*, reject*/ ) {
 
                                     setTimeout( function() { value++; resolve(); }, 10 );
                                 });
@@ -299,6 +288,38 @@ describe( 'lib/index', function() {
                     .expectResult( function( result ) {
 
                         expect( result ).to.equal( 'ok' );
+                    });
+            });
+
+            it( 'with loadHandler()', function() {
+
+                let tester = LambdaTester();
+
+                let spy = sinon.spy( LAMBDA_SIMPLE_SUCCEED );
+
+                let returnValue = tester.loadHandler( function() {
+
+                    return spy;
+                });
+
+                expect( returnValue ).to.equal( tester );
+
+                return tester.expectSucceed( function() {
+
+                    expect( spy.calledOnce ).to.be.true;
+                });
+            });
+
+            it( 'with after()', function() {
+
+                let myAfter = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .after( myAfter )
+                    .expectSucceed()
+                    .then( function() {
+
+                        expect( myAfter.calledOnce ).to.be.true;
                     });
             });
 
@@ -477,7 +498,7 @@ describe( 'lib/index', function() {
 
                 let tester = LambdaTester( LAMBDA_SIMPLE_FAIL );
 
-                let verifier = function( err ) {};
+                let verifier = function( /*err*/ ) {};
 
                 let returnValue = tester.expectFail( verifier );
 
@@ -506,12 +527,12 @@ describe( 'lib/index', function() {
                 let value = 1;
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
-                    .expectFail( function( result ) {
+                    .expectFail( function( /*result*/ ) {
 
                         return Promise.resolve()
                             .then( function() {
 
-                                return new Promise( function( resolve, reject ) {
+                                return new Promise( function( resolve /*, reject*/ ) {
 
                                     setTimeout( function() { value++; resolve(); }, 10 );
                                 });
@@ -520,6 +541,41 @@ describe( 'lib/index', function() {
                     .then( function() {
 
                         expect( value ).to.equal( 2 );
+                    });
+            });
+
+            it( 'with loadHandler()', function() {
+
+                let tester = LambdaTester();
+
+                let spy = sinon.spy( LAMBDA_SIMPLE_FAIL );
+
+                let returnValue = tester.loadHandler( function() {
+
+                    return spy;
+                });
+
+                expect( returnValue ).to.equal( tester );
+
+                return tester.expectFail( function() {
+
+                    expect( spy.calledOnce ).to.be.true;
+                });
+            });
+
+            it( 'with after()', function() {
+
+                let myAfter = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .after( myAfter )
+                    .expectFail( function() {
+
+                        expect( myAfter.called ).to.be.false;
+                    })
+                    .then( function() {
+
+                        expect( myAfter.calledOnce ).to.be.true;
                     });
             });
 
@@ -544,7 +600,7 @@ describe( 'lib/index', function() {
                 let done = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
-                    .expectFail( function( err ) {
+                    .expectFail( function( /*err*/ ) {
 
                         throw new Error( 'boom' );
                     })
@@ -657,6 +713,41 @@ describe( 'lib/index', function() {
                     .expectError( function( err ) {
 
                         expect( err.message ).to.equal( 'bang' );
+                    });
+            });
+
+            it( 'with loadHandler()', function() {
+
+                let tester = LambdaTester();
+
+                let spy = sinon.spy( LAMBDA_SIMPLE_CALLBACK_ERROR );
+
+                let returnValue = tester.loadHandler( function() {
+
+                    return spy;
+                });
+
+                expect( returnValue ).to.equal( tester );
+
+                return tester.expectError( function() {
+
+                    expect( spy.calledOnce ).to.be.true;
+                });
+            });
+
+            it( 'with after()', function() {
+
+                let myAfter = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
+                    .after( myAfter )
+                    .expectError( function() {
+
+                        expect( myAfter.called ).to.be.false;
+                    })
+                    .then( function() {
+
+                        expect( myAfter.calledOnce ).to.be.true;
                     });
             });
 
@@ -786,6 +877,41 @@ describe( 'lib/index', function() {
                     .expectResult( function( result ) {
 
                         expect( result ).to.equal( 'ok' );
+                    });
+            });
+
+            it( 'with loadHandler()', function() {
+
+                let tester = LambdaTester();
+
+                let spy = sinon.spy( LAMBDA_SIMPLE_CALLBACK );
+
+                let returnValue = tester.loadHandler( function() {
+
+                    return spy;
+                });
+
+                expect( returnValue ).to.equal( tester );
+
+                return tester.expectResult( function() {
+
+                    expect( spy.calledOnce ).to.be.true;
+                });
+            });
+
+            it( 'with after()', function() {
+
+                let myAfter = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .after( myAfter )
+                    .expectResult( function() {
+
+                        expect( myAfter.called ).to.be.false;
+                    })
+                    .then( function() {
+
+                        expect( myAfter.calledOnce ).to.be.true;
                     });
             });
 
