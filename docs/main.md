@@ -10,6 +10,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Detects resource leaks [experimental]
 * Supports Promises
 * Easily integrates with test frameworks
+* Handlers can be loaded and removed after execution
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
 * Automatically loads .env files
@@ -156,68 +157,6 @@ describe( 'handler', function() {
 });
 ```
 
-## Verifying `context.succeed()`, `context.fail` and `context.done()`
-
-On April 8, 2016 AWS Lambda introduced support for Lambda callbacks that replace the need to call `context.fail()` or `context.succeed()`.
-
-### Verifying `context.succeed()`
-
-When `expectSucceed()` is called, one can pass a function to perform additional validation. For example:
-
-
-```js
-const LambdaTester = require( 'lambda-tester' );
-
-// your favorite validation tool here
-const expect = require( 'chai' ).expect;
-
-const myHandler = require( '../index' ).handler;
-
-describe( 'handler', function() {
-
-	it( 'test success', function() {
-
-		return LambdaTester( myHandler )
-			.event( { name: 'Fred' } )
-			.expectSucceed( function( result ) {
-
-				expect( result.userId ).to.exist;
-				expect( result.user ).to.equal( 'fredsmith' );
-			});
-	});
-});
-```
-
-### Verifying `context.fail()`
-
-As with verifying success, `expectFail` has an optional parameter that can specify a function that will verify the error condition. For example:
-
-```js
-const LambdaTester = require( 'lambda-tester' );
-
-// your favorite validation tool here
-const expect = require( 'chai' ).expect;
-
-const myHandler = require( '../index' ).handler;
-
-describe( 'handler', function() {
-
-	it( 'test failure', function() {
-
-		return LambdaTester( myHandler )
-			.event( { name: 'Unknown' } )
-			.expectFail( function( err ) {
-
-				expect( err.message ).to.equal( 'User not found' );
-			});
-	});
-});
-```
-
-### Verifying `context.done()`
-
-AWS Lambda routes `context.done()` to `context.succed()` and `context.fail()` for results or errors respectively, thus you can use the methods described above to verify those scenarios.
-
 ## Resource Leak detection
 
 **Note**: This feature is experimental and disabled by default.
@@ -319,6 +258,67 @@ describe( 'handler', function() {
 });
 ```
 
+## Verifying `context.succeed()`, `context.fail` and `context.done()`
+
+On April 8, 2016 AWS Lambda introduced support for Lambda callbacks that replace the need to call `context.fail()` or `context.succeed()`.
+
+### Verifying `context.succeed()`
+
+When `expectSucceed()` is called, one can pass a function to perform additional validation. For example:
+
+
+```js
+const LambdaTester = require( 'lambda-tester' );
+
+// your favorite validation tool here
+const expect = require( 'chai' ).expect;
+
+const myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test success', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Fred' } )
+			.expectSucceed( function( result ) {
+
+				expect( result.userId ).to.exist;
+				expect( result.user ).to.equal( 'fredsmith' );
+			});
+	});
+});
+```
+
+### Verifying `context.fail()`
+
+As with verifying success, `expectFail` has an optional parameter that can specify a function that will verify the error condition. For example:
+
+```js
+const LambdaTester = require( 'lambda-tester' );
+
+// your favorite validation tool here
+const expect = require( 'chai' ).expect;
+
+const myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test failure', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Unknown' } )
+			.expectFail( function( err ) {
+
+				expect( err.message ).to.equal( 'User not found' );
+			});
+	});
+});
+```
+
+### Verifying `context.done()`
+
+AWS Lambda routes `context.done()` to `context.succed()` and `context.fail()` for results or errors respectively, thus you can use the methods described above to verify those scenarios.
 
 ## Feedback
 

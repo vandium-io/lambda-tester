@@ -10,6 +10,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Detects resource leaks [experimental]
 * Supports Promises
 * Easily integrates with test frameworks
+* Handlers can be loaded and removed after execution
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
 * Automatically loads .env files
@@ -73,9 +74,13 @@ describe( 'handler', function() {
 
 Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises.
 
-## documentation
+## Documentation
 
 Complete documentation can be found in our [documentation](docs/main.md) page.
+
+## Projects Using `lambda-tester`
+
+* [vandium](https://github.com/vandium-io/vandium-node) - Secures and simplifies AWS Lambda handlers
 
 ## Feedback
 

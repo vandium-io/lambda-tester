@@ -1,3 +1,14 @@
+## 2.3.0 (TBD)
+
+New:
+
+* Automatically loads `.env` files when `lambda-tester` is loaded during `require()`.
+* Handlers can be loaded and cleaned up after execution
+
+Updated:
+
+* Leak detector moved to `lambda-leak` and included as a dependency. Still experimental status
+
 ## 2.2.1 (2016-04-17)
 
 Fixed:
