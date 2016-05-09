@@ -334,7 +334,7 @@ describe( 'lib/index', function() {
                         },
                         function( err ) {
 
-                            expect( err.message ).to.equal( 'encountered error but expected the handler to succeed' );
+                            expect( err.message ).to.equal( 'encountered error but expected the handler to succeed - cause: bang' );
                             expect( err.cause.message ).to.equal( 'bang' );
                         });
             });
@@ -590,7 +590,7 @@ describe( 'lib/index', function() {
                         },
                         function( err ) {
 
-                            expect( err.message ).to.equal( 'encountered successful operation but expected failure' );
+                            expect( err.message ).to.equal( 'encountered successful operation but expected failure - result: ok' );
                             expect( err.result ).to.equal( 'ok' );
                         });
             });
@@ -809,7 +809,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'expecting error' );
+                            expect( err.message ).to.equal( 'expecting error but got result: ok' );
                             expect( err.result ).to.equal( 'ok' );
                         }
                     );
@@ -973,7 +973,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'expecting result' );
+                            expect( err.message ).to.equal( 'expecting result but error was thrown  - cause: bang' );
                         }
                     );
             });
