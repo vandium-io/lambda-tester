@@ -8,7 +8,11 @@ const sinon = require( 'sinon' );
 
 const fs = require( 'fs' );
 
-const LambdaTester = require( '../../lib/index' );
+const freshy = require( 'freshy' );
+
+const appRoot = require( 'app-root-path' );
+
+const LAMBDA_TESTER_PATH = '../../lib/index';
 
 const LAMBDA_LONG_TIMEOUT = 1100;
 
@@ -92,6 +96,8 @@ const LAMBDA_THROWS = function( event, context, callback ) {
 
 
 describe( 'lib/index', function() {
+
+    let LambdaTester = require( LAMBDA_TESTER_PATH );
 
     describe( 'environment variables', function() {
 
@@ -320,6 +326,46 @@ describe( 'lib/index', function() {
                     .then( function() {
 
                         expect( myAfter.calledOnce ).to.be.true;
+                    });
+            });
+
+            it( 'fail: when loadHandler does not return a handler', function() {
+
+                let tester = LambdaTester();
+
+                let stubLoader = sinon.stub();
+
+                let returnValue = tester.loadHandler( stubLoader );
+
+                expect( returnValue ).to.equal( tester );
+
+                return tester.expectSucceed( function() {
+
+                        throw new Error( 'should not succeed' );
+                    })
+                    .catch( function( err ) {
+
+                        expect( err.message ).to.equal( 'no handler specified or returned from loadHandler()' );
+                    });
+            });
+
+            it( 'fail: when loadHandler throws exception', function() {
+
+                let tester = LambdaTester();
+
+                let stubLoader = sinon.stub().throws( new Error( 'bang' ) );
+
+                let returnValue = tester.loadHandler( stubLoader );
+
+                expect( returnValue ).to.equal( tester );
+
+                return tester.expectSucceed( function() {
+
+                        throw new Error( 'should not succeed' );
+                    })
+                    .catch( function( err ) {
+
+                        expect( err.message ).to.equal( 'bang' );
                     });
             });
 
@@ -1016,6 +1062,65 @@ describe( 'lib/index', function() {
                             expect( err.message ).to.contain( 'handler timed out - execution time:' );
                         }
                     );
+            });
+        });
+
+        describe( '.env', function() {
+
+            let envPath = appRoot + '/.env';
+
+            beforeEach( function() {
+
+                delete process.env.TEST_VALUE;
+                delete process.env.LAMBDA_TESTER_NO_ENV;
+
+                freshy.unload( 'dotenv' );
+
+                freshy.unload( LAMBDA_TESTER_PATH );
+
+                try {
+
+                    fs.unlinkSync( envPath );
+                }
+                catch( err ) {
+
+                    // ignore
+                }
+            });
+
+            after( function() {
+
+                freshy.unload( LAMBDA_TESTER_PATH );
+
+                delete process.env.LAMBDA_TESTER_NO_ENV;
+
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+            });
+
+            it( 'without .env', function() {
+
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+
+                expect( process.env.TEST_VALUE ).to.not.exist;
+            });
+
+            it( 'with .env', function() {
+
+                fs.writeFileSync( envPath, 'TEST_VALUE=test' );
+
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+
+                expect( process.env.TEST_VALUE ).to.exist;
+                expect( process.env.TEST_VALUE ).to.equal( 'test' );
+            });
+
+            it( 'with .env and LAMBDA_TESTER_NO_ENV defined', function() {
+
+                process.env.LAMBDA_TESTER_NO_ENV = true;
+
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+
+                expect( process.env.TEST_VALUE ).to.not.exist;
             });
         });
     });
