@@ -32,6 +32,7 @@
   "license": "BSD-3-Clause",
   "devDependencies": {
     "chai": "^3.5.0",
+    "freshy": "^1.0.2",
     "istanbul": "^0.4.2",
     "mocha": "^2.4.5",
     "sinon": "^1.17.3"
