@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/vandium-io/lambda-tester.svg?branch=master)](https://travis-ci.org/vandium-io/lambda-tester)
+[![npm version](https://badge.fury.io/js/lambda-tester.svg)](https://badge.fury.io/js/lambda-tester)
 
 # lambda-tester
 
