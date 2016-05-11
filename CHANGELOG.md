@@ -1,9 +1,19 @@
-## 2.3.0 (TBD)
+## 2.4.0 (TBD)
+
+New:
+
+* Added support for custom `context` values to support cognito identities and mobile apps. Thanks @xsurfing
+
+## 2.3.0 (2016-05-10)
 
 New:
 
 * Automatically loads `.env` files when `lambda-tester` is loaded during `require()`.
 * Handlers can be loaded and cleaned up after execution
+
+Improved:
+
+* Added cause to error messages
 
 Updated:
 

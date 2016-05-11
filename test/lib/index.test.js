@@ -131,6 +131,10 @@ describe( 'lib/index', function() {
                 let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+
+                expect( tester._handler ).to.equal( LAMBDA_SIMPLE_SUCCEED );
+                expect( tester._context ).to.eql( {} );
+                expect( tester._event ).to.eql( {} );
             });
 
             it( 'called with new', function() {
@@ -138,6 +142,10 @@ describe( 'lib/index', function() {
                 let tester = new LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+
+                expect( tester._handler ).to.equal( LAMBDA_SIMPLE_SUCCEED );
+                expect( tester._context ).to.eql( {} );
+                expect( tester._event ).to.eql( {} );
             });
 
             it( 'called without handler', function() {
@@ -146,6 +154,8 @@ describe( 'lib/index', function() {
 
                 expect( tester.constructor.name ).to.equal( 'LambdaTester' );
                 expect( tester._handler ).to.not.exist;
+                expect( tester._context ).to.eql( {} );
+                expect( tester._event ).to.eql( {} );
             });
         });
 
@@ -173,6 +183,185 @@ describe( 'lib/index', function() {
                 let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
                 expect( tester.event.bind( tester ) ).to.throw( 'missing event' );
+            });
+        });
+
+        describe( '.identity', function() {
+
+            it( 'normal operation', function() {
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    expect( context.identity ).to.exist;
+
+                    callback( null, context.identity );
+                });
+
+                let returnValue = tester.identity( 'cog-id', 'cog-pool-id' );
+
+                expect( returnValue ).to.equal( tester );
+
+                expect( tester._context ).to.eql( {
+
+                    identity: {
+
+                        cognitoIdentityId: 'cog-id',
+                        cognitoIdentityPoolId: 'cog-pool-id'
+                    }
+                });
+
+                return tester.expectResult( function( result ) {
+
+                        expect( result ).to.eql( { cognitoIdentityId: 'cog-id', cognitoIdentityPoolId: 'cog-pool-id' } );
+                    });
+            });
+
+            it( 'with context already being set', function() {
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    expect( context.identity ).to.exist;
+
+                    callback( null, context.identity );
+                });
+
+                tester.context( { one: 1 } );
+
+                let returnValue = tester.identity( 'cog-id', 'cog-pool-id' );
+
+                expect( returnValue ).to.equal( tester );
+
+                expect( tester._context ).to.eql( {
+
+                    one: 1,
+                    identity: {
+
+                        cognitoIdentityId: 'cog-id',
+                        cognitoIdentityPoolId: 'cog-pool-id'
+                    }
+                });
+
+                return tester.expectResult( function( result ) {
+
+                        expect( result ).to.eql( { cognitoIdentityId: 'cog-id', cognitoIdentityPoolId: 'cog-pool-id' } );
+                    });
+            });
+        });
+
+        describe( '.clientContext', function() {
+
+            it( 'normal operation', function() {
+
+                let clientContext = { client: {} };
+
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    expect( context.clientContext ).to.exist;
+
+                    callback( null, context.clientContext );
+                });
+
+                let returnValue = tester.clientContext( clientContext );
+
+                expect( returnValue ).to.equal( tester );
+
+                expect( tester._context ).to.eql( { clientContext } );
+
+                return tester.expectResult( function( result ) {
+
+                        // should be the original object
+                        expect( result ).to.equal( clientContext );
+                    });
+            });
+
+            it( 'with context already being set', function() {
+
+                let clientContext = { client: {} };
+
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    expect( context.clientContext ).to.exist;
+
+                    callback( null, context.clientContext );
+                });
+
+                tester.context( { one: 1 } );
+
+                let returnValue = tester.clientContext( clientContext );
+
+                expect( returnValue ).to.equal( tester );
+
+                expect( tester._context ).to.eql( { one: 1, clientContext } );
+
+                return tester.expectResult( function( result ) {
+
+                        // should be the original object
+                        expect( result ).to.equal( clientContext );
+                    });
+            });
+        });
+
+        describe( '.context', function() {
+
+            it( 'normal operation', function() {
+
+                let context = { one: 1, two: 'II', three: 'thr33' };
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    expect( context.one ).to.exist;
+                    expect( context.two ).to.exist;
+                    expect( context.three ).to.exist;
+
+                    callback( null, { one: context.one, two: context.two, three: context.three } );
+                });
+
+                let returnValue = tester.context( context );
+
+                expect( returnValue ).to.equal( tester );
+
+                // should be a copy
+                expect( tester._context ).to.not.equal( context );
+
+                expect( tester._context ).to.eql( context );
+
+                return tester.expectResult( function( result ) {
+
+                        // should not be the original object
+                        expect( result ).to.not.equal( context );
+
+                        expect( result ).to.eql( context );
+                    });
+            });
+
+            it( 'multiple calls', function() {
+
+                let fullContext = { one: 1, two: 'II', three: 'thr33' };
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    expect( context.one ).to.exist;
+                    expect( context.two ).to.exist;
+                    expect( context.three ).to.exist;
+
+                    callback( null, { one: context.one, two: context.two, three: context.three } );
+                });
+
+                tester.context( { a: 1 } );
+                tester.context( { b: 1 } );
+                tester.context( { c: 1 } );
+
+                // should replace all
+                tester.context( fullContext );
+
+                expect( tester._context ).to.eql( fullContext );
+
+                return tester.expectResult( function( result ) {
+
+                        expect( result ).to.eql( fullContext );
+                    });
             });
         });
 
