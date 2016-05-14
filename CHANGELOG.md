@@ -1,3 +1,9 @@
+## 2.5.0 (2016-05-14)
+
+New:
+
+* Added auto generated context values to better simulate Lambda environment
+
 ## 2.4.0 (2016-05-11)
 
 New:
