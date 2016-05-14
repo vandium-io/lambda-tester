@@ -363,6 +363,91 @@ describe( 'lib/index', function() {
                         expect( result ).to.eql( fullContext );
                     });
             });
+
+            it( 'auto generated content - default values', function() {
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    callback( null, Object.assign( {}, context ) );
+                });
+
+                return tester.expectResult( function( result ) {
+
+                    expect( result.functionName ).to.equal( 'testLambda' );
+                    expect( result.functionVersion ).to.equal( '$LATEST' );
+                    expect( result.memoryLimitInMB ).to.equal( '128' );
+                    expect( result.logGroupName ).to.equal( '/aws/lambda/testLambda' );
+
+                    expect( result.logStreamName ).to.contain( '[$LATEST]' );
+                    expect( result.logStreamName.length ).to.equal( 52 );
+
+                    expect( result.invokedFunctionArn ).to.equal( 'arn:aws:lambda:us-east-1:999999999999:function:testLambda');
+
+                    expect( result.invokeid ).to.exist;
+                    expect( result.invokeid.length ).to.equal( 36 );
+
+                    expect( result.awsRequestId ).to.equal( result.invokeid );
+                });
+            });
+
+            it( 'auto generated content using default items', function() {
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    callback( null, Object.assign( {}, context ) );
+                });
+
+                tester.context( { functionName: 'myLambda', functionVersion: '6', memoryLimitInMB: '256' })
+
+                return tester.expectResult( function( result ) {
+
+                    expect( result.functionName ).to.equal( 'myLambda' );
+                    expect( result.functionVersion ).to.equal( '6' );
+                    expect( result.memoryLimitInMB ).to.equal( '256' );
+                    expect( result.logGroupName ).to.equal( '/aws/lambda/myLambda' );
+
+                    expect( result.logStreamName ).to.contain( '[6]' );
+
+                    expect( result.invokedFunctionArn ).to.equal( 'arn:aws:lambda:us-east-1:999999999999:function:myLambda');
+
+                    expect( result.invokeid ).to.exist;
+                    expect( result.invokeid.length ).to.equal( 36 );
+
+                    expect( result.awsRequestId ).to.equal( result.invokeid );
+                });
+            });
+
+            it( 'override auto generated content', function() {
+
+                let tester = LambdaTester( function( event, context, callback ) {
+
+                    callback( null, Object.assign( {}, context ) );
+                });
+
+                tester.context( {
+
+                    functionName: 'myLambda',
+                    functionVersion: '6',
+                    memoryLimitInMB: '256',
+                    logGroupName: 'myLogGroup',
+                    logStreamName: 'myLogStream',
+                    invokedFunctionArn: 'arn',
+                    invokeid: '1234',
+                    awsRequestId: '5678'
+                });
+
+                return tester.expectResult( function( result ) {
+
+                    expect( result.functionName ).to.equal( 'myLambda' );
+                    expect( result.functionVersion ).to.equal( '6' );
+                    expect( result.memoryLimitInMB ).to.equal( '256' );
+                    expect( result.logGroupName ).to.equal( 'myLogGroup' );
+                    expect( result.logStreamName ).to.equal( 'myLogStream' );
+                    expect( result.invokedFunctionArn ).to.equal( 'arn' );
+                    expect( result.invokeid ).to.equal( '1234' );
+                    expect( result.awsRequestId ).to.equal( '5678' );
+                });
+            });
         });
 
         describe( '.expectSucceed', function() {
