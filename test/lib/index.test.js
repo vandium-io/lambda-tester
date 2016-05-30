@@ -172,10 +172,15 @@ describe( 'lib/index', function() {
                 expect( returnValue ).to.equal( tester );
                 expect( tester._event ).to.eql( { one: 1 } );
 
-                returnValue = tester.event( { two: 2 } );
+                let event = { two: 2 };
+
+                returnValue = tester.event( event );
 
                 expect( tester.constructor.name ).to.equal( 'LambdaTester' );
-                expect( tester._event ).to.eql( { two: 2 } );
+                expect( tester._event ).to.eql( event );
+
+                // should not be same instance
+                expect( tester._event ).to.not.equal( event );
             });
 
             it( 'fail: event missing', function() {
