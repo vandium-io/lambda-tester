@@ -1,3 +1,11 @@
+# Change Log
+
+## 2.5.1 (2016-05-29)
+
+Updated:
+
+* `event()` changed to make a copy of the object that was passed
+
 ## 2.5.0 (2016-05-14)
 
 New:
