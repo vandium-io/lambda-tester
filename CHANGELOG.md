@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.6.0 (2016-06-27)
+
+Updated:
+
+* `context.fail()` and `callback()` now support strings, which will get converted into `Error` instances. This behavior matches
+that of Lambda. 
+
 ## 2.5.1 (2016-05-29)
 
 Updated:
