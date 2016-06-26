@@ -39,6 +39,11 @@ const LAMBDA_SIMPLE_FAIL = function( event, context ) {
     context.fail( new Error( 'bang' ) );
 };
 
+const LAMBDA_SIMPLE_FAIL_STRING = function( event, context ) {
+
+    context.fail( 'bang' );
+};
+
 const LAMBDA_SIMPLE_FAIL_DONE = function( event, context ) {
 
     context.done( new Error( 'bang' ) );
@@ -791,6 +796,18 @@ describe( 'lib/index', function() {
             it( 'without verifier', function() {
 
                 let tester = LambdaTester( LAMBDA_SIMPLE_FAIL );
+
+                let returnValue = tester.expectFail();
+
+                expect( returnValue ).to.be.instanceof( Promise );
+                expect( returnValue.verify ).to.be.a( 'function' );
+
+                return returnValue;
+            });
+
+            it( 'without verifier, error is a string', function() {
+
+                let tester = LambdaTester( LAMBDA_SIMPLE_FAIL_STRING );
 
                 let returnValue = tester.expectFail();
 
