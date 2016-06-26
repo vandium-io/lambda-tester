@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "description": "Unit/Integration tests for AWS Lambda handlers",
   "main": "lib/index.js",
   "keywords": [
@@ -41,6 +41,7 @@
     "app-root-path": "^1.0.0",
     "dotenv": "^2.0.0",
     "lambda-leak": "^1.0.0",
-    "node-uuid": "^1.4.7"
+    "node-uuid": "^1.4.7",
+    "vandium-utils": "^1.0.0"
   }
 }
