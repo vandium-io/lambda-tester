@@ -1,0 +1,24 @@
+{
+  "name": "aws-service-example",
+  "version": "1.0.0",
+  "description": "Demonstrates how to stub and test an AWS lambda hander calling an AWS service",
+  "main": "lib/index.js",
+  "engines": {
+    "node": ">=4.3.2"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --recursive",
+    "coverage": "./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- -R spec --recursive"
+  },
+  "author": "Vandium Software Inc.",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "aws-sdk": "^2.6.0",
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.2",
+    "lambda-tester": "file:../..",
+    "mocha": "^2.4.5",
+    "proxyquire": "^1.7.10",
+    "sinon": "^1.17.5"
+  }
+}

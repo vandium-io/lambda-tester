@@ -4,6 +4,8 @@ test-other
 
 coverage
 
+examples
+
 .travis.yml
 
 .jshintrc
