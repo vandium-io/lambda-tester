@@ -41,7 +41,7 @@
     "app-root-path": "^1.0.0",
     "dotenv": "^2.0.0",
     "lambda-leak": "^1.0.0",
-    "node-uuid": "^1.4.7",
+    "uuid": "^3.0.0",
     "vandium-utils": "^1.0.0"
   }
 }
