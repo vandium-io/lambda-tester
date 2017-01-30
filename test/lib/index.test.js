@@ -21,6 +21,16 @@ const LAMBDA_SIMPLE_SUCCEED = function( event, context ) {
     context.succeed( 'ok' );
 };
 
+const LAMBDA_SIMPLE_SUCCEED_ARRAY = function( event, context ) {
+
+    if( !Array.isArray( event ) ) {
+
+        return context.fail( new Error( 'bad' ) );
+    }
+
+    context.succeed( 'ok' );
+};
+
 const LAMBDA_SIMPLE_SUCCEED_DONE = function( event, context ) {
 
     context.done( null, 'ok' );
@@ -188,11 +198,27 @@ describe( 'lib/index', function() {
                 expect( tester._event ).to.not.equal( event );
             });
 
-            it( 'fail: event missing', function() {
+            it( 'event missing', function() {
 
                 let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
-                expect( tester.event.bind( tester ) ).to.throw( 'missing event' );
+                tester.event();
+
+                expect( tester._event ).to.eql( {} );
+            });
+
+            it( 'event is array of events', function() {
+
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+
+                let e1 = {};
+                let e2 = {};
+
+                tester.event( [ e1, e2 ] );
+
+                expect( tester._event ).to.be.an( 'Array' );
+                expect( tester._event[0] ).to.equal( e1 );
+                expect( tester._event[1] ).to.equal( e2 );
             });
         });
 
@@ -465,6 +491,18 @@ describe( 'lib/index', function() {
             it( 'without verifier', function() {
 
                 let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+
+                let returnValue = tester.expectSucceed();
+
+                expect( returnValue ).to.be.instanceof( Promise );
+                expect( returnValue.verify ).to.be.a( 'function' );
+
+                return returnValue;
+            });
+
+            it( 'without verifier, event is an array', function() {
+
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED_ARRAY ).event( [ {}, {} ] );
 
                 let returnValue = tester.expectSucceed();
 

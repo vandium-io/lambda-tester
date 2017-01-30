@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.7.0 (Unreleased)
+
+Updated:
+
+* `event` can an array
+
+
 ## 2.6.1 (2016-11-28)
 
 Internal:
