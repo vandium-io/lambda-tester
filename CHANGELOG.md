@@ -1,10 +1,10 @@
 # Change Log
 
-## 2.7.0 (Unreleased)
+## 2.7.0 (2017-01-31)
 
 Updated:
 
-* `event` can an array
+* `event` can an array (#9)
 
 
 ## 2.6.1 (2016-11-28)
