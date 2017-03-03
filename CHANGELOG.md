@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.8.0 (TBD)
+
+Updated:
+
+* Automatically detects `done.fail()` to support Jasmine users. Thanks @toaster
+
+Internal:
+
+* Code clean-up and refactor
+
 ## 2.7.0 (2017-01-31)
 
 Updated:

@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Unit/Integration tests for AWS Lambda handlers",
   "main": "lib/index.js",
   "keywords": [
