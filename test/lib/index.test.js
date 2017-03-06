@@ -112,7 +112,15 @@ const LAMBDA_THROWS = function( event, context, callback ) {
 
 describe( 'lib/index', function() {
 
-    let LambdaTester = require( LAMBDA_TESTER_PATH );
+    let LambdaTester;
+
+    beforeEach( function() {
+
+        // make sure we have an artifact free version each time
+        freshy.unload( LAMBDA_TESTER_PATH );
+
+        LambdaTester = require( LAMBDA_TESTER_PATH );
+    });
 
     describe( 'environment variables', function() {
 
@@ -277,7 +285,7 @@ describe( 'lib/index', function() {
                     }
                 });
 
-                return tester.expectResult( function( result ) {
+                return tester.expectResult( ( result ) => {
 
                         expect( result ).to.eql( { cognitoIdentityId: 'cog-id', cognitoIdentityPoolId: 'cog-pool-id' } );
                     });
@@ -304,7 +312,7 @@ describe( 'lib/index', function() {
 
                 expect( tester._context ).to.eql( { clientContext } );
 
-                return tester.expectResult( function( result ) {
+                return tester.expectResult( ( result ) => {
 
                         // should be the original object
                         expect( result ).to.equal( clientContext );
@@ -331,7 +339,7 @@ describe( 'lib/index', function() {
 
                 expect( tester._context ).to.eql( { one: 1, clientContext } );
 
-                return tester.expectResult( function( result ) {
+                return tester.expectResult( ( result ) => {
 
                         // should be the original object
                         expect( result ).to.equal( clientContext );
@@ -363,7 +371,7 @@ describe( 'lib/index', function() {
 
                 expect( tester._context ).to.eql( context );
 
-                return tester.expectResult( function( result ) {
+                return tester.expectResult( ( result ) => {
 
                         // should not be the original object
                         expect( result ).to.not.equal( context );
@@ -394,7 +402,7 @@ describe( 'lib/index', function() {
 
                 expect( tester._context ).to.eql( fullContext );
 
-                return tester.expectResult( function( result ) {
+                return tester.expectResult( ( result ) => {
 
                         expect( result ).to.eql( fullContext );
                     });
@@ -407,7 +415,7 @@ describe( 'lib/index', function() {
                     callback( null, Object.assign( {}, context ) );
                 });
 
-                return tester.expectResult( function( result ) {
+                return tester.expectResult( ( result ) => {
 
                     expect( result.functionName ).to.equal( 'testLambda' );
                     expect( result.functionVersion ).to.equal( '$LATEST' );
@@ -435,7 +443,7 @@ describe( 'lib/index', function() {
 
                 tester.context( { functionName: 'myLambda', functionVersion: '6', memoryLimitInMB: '256' })
 
-                return tester.expectResult( function( result ) {
+                return tester.expectResult( ( result ) => {
 
                     expect( result.functionName ).to.equal( 'myLambda' );
                     expect( result.functionVersion ).to.equal( '6' );
@@ -472,7 +480,7 @@ describe( 'lib/index', function() {
                     awsRequestId: '5678'
                 });
 
-                return tester.expectResult( function( result ) {
+                return tester.expectResult( ( result ) => {
 
                     expect( result.functionName ).to.equal( 'myLambda' );
                     expect( result.functionVersion ).to.equal( '6' );
@@ -543,7 +551,7 @@ describe( 'lib/index', function() {
                 expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue
-                    .then( function() {
+                    .then( () => {
 
                         expect( verifier.calledOnce ).to.be.true;
                         expect( verifier.withArgs( 'ok' ).calledOnce ).to.be.true;
@@ -557,7 +565,7 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
                     .expectSucceed()
                     .verify( done )
-                    .then( function() {
+                    .then( () => {
 
                         expect( done.calledOnce ).to.be.true;
                         expect( done.withArgs().calledOnce ).to.be.true;
@@ -574,13 +582,13 @@ describe( 'lib/index', function() {
                         return Promise.resolve()
                             .then( function() {
 
-                                return new Promise( function( resolve /*, reject*/ ) {
+                                return new Promise( ( resolve /*, reject*/ ) => {
 
-                                    setTimeout( function() { value++; resolve(); }, 10 );
+                                    setTimeout( () => { value++; resolve(); }, 10 );
                                 });
                             });
                     })
-                    .then( function() {
+                    .then( () => {
 
                         expect( value ).to.equal( 2 );
                     });
@@ -592,11 +600,11 @@ describe( 'lib/index', function() {
 
                 return LambdaTester( function( event, context, callback) {
 
-                        setTimeout( function() {}, 100 );
+                        setTimeout( () => {}, 100 );
 
                         callback( null, 'ok' );
                     })
-                    .expectResult( function( result ) {
+                    .expectResult( ( result ) => {
 
                         expect( result ).to.equal( 'ok' );
                     });
@@ -608,12 +616,12 @@ describe( 'lib/index', function() {
 
                 return LambdaTester( function( event, context, callback) {
 
-                        setTimeout( function() {
+                        setTimeout( () => {
 
                             callback( null, 'ok' );
                         }, 100 );
                     })
-                    .expectResult( function( result ) {
+                    .expectResult( ( result ) => {
 
                         expect( result ).to.equal( 'ok' );
                     });
@@ -625,14 +633,14 @@ describe( 'lib/index', function() {
 
                 let spy = sinon.spy( LAMBDA_SIMPLE_SUCCEED );
 
-                let returnValue = tester.loadHandler( function() {
+                let returnValue = tester.loadHandler( () => {
 
                     return spy;
                 });
 
                 expect( returnValue ).to.equal( tester );
 
-                return tester.expectSucceed( function() {
+                return tester.expectSucceed( () => {
 
                     expect( spy.calledOnce ).to.be.true;
                 });
@@ -645,7 +653,7 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
                     .after( myAfter )
                     .expectSucceed()
-                    .then( function() {
+                    .then( () => {
 
                         expect( myAfter.calledOnce ).to.be.true;
                     });
@@ -661,11 +669,11 @@ describe( 'lib/index', function() {
 
                 expect( returnValue ).to.equal( tester );
 
-                return tester.expectSucceed( function() {
+                return tester.expectSucceed( () => {
 
                         throw new Error( 'should not succeed' );
                     })
-                    .catch( function( err ) {
+                    .catch( ( err ) => {
 
                         expect( err.message ).to.equal( 'no handler specified or returned from loadHandler()' );
                     });
@@ -681,11 +689,11 @@ describe( 'lib/index', function() {
 
                 expect( returnValue ).to.equal( tester );
 
-                return tester.expectSucceed( function() {
+                return tester.expectSucceed( () => {
 
                         throw new Error( 'should not succeed' );
                     })
-                    .catch( function( err ) {
+                    .catch( ( err ) => {
 
                         expect( err.message ).to.equal( 'bang' );
                     });
@@ -696,11 +704,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .expectSucceed()
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not succeed' );
                         },
-                        function( err ) {
+                        ( err ) => {
 
                             expect( err.message ).to.equal( 'encountered error but expected the handler to succeed - cause: bang' );
                             expect( err.cause.message ).to.equal( 'bang' );
@@ -712,12 +720,12 @@ describe( 'lib/index', function() {
                 let done = sinon.stub();
 
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectSucceed( function() {
+                    .expectSucceed( () => {
 
                         throw new Error( 'bang' );
                     })
                     .verify( done )
-                    .then( function() {
+                    .then( () => {
 
                             expect( done.calledOnce ).to.be.true;
 
@@ -733,11 +741,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectSucceed( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should fail' );
                         },
-                        function( err ) {
+                        ( err ) => {
 
                             expect( err.message ).to.equal( 'callback called' );
                             expect( err.result ).to.equal( 'ok' );
@@ -752,11 +760,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
                     .expectSucceed( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should fail' );
                         },
-                        function( err ) {
+                        ( err ) => {
 
                             expect( err.message ).to.equal( 'callback called with error parameter' );
                             expect( err.cause.message ).to.equal( 'bang' );
@@ -771,12 +779,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_THROWS )
                     .expectSucceed( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not work' );
                         },
-
-                        function( err ) {
+                        ( err ) => {
 
                             expect( verifier.called ).to.be.false;
 
@@ -793,11 +800,11 @@ describe( 'lib/index', function() {
                     .timeout( 1 )
                     .expectSucceed()
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not work' );
                         },
-                        function( err ) {
+                        ( err ) => {
 
                             expect( err.message ).to.contain( 'handler timed out - execution time:' );
                         }
@@ -808,15 +815,15 @@ describe( 'lib/index', function() {
 
                 return LambdaTester( function( event, context, callback) {
 
-                        setTimeout( function() {}, 100 );
+                        setTimeout( () => {}, 100 );
 
                         callback( null, 'ok' );
                     })
-                    .expectResult( function() {
+                    .expectResult( () => {
 
                         throw new Error( 'should not succeed' );
                     })
-                    .catch( function( err ) {
+                    .catch( ( err ) => {
 
                         expect( err.message ).to.equal( 'Potential handle leakage detected' );
 
@@ -895,7 +902,7 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .expectFail()
                     .verify( done )
-                    .then( function() {
+                    .then( () => {
 
                         expect( done.calledOnce ).to.be.true;
                         expect( done.withArgs().calledOnce ).to.be.true;
@@ -910,15 +917,15 @@ describe( 'lib/index', function() {
                     .expectFail( function( /*result*/ ) {
 
                         return Promise.resolve()
-                            .then( function() {
+                            .then( () => {
 
-                                return new Promise( function( resolve /*, reject*/ ) {
+                                return new Promise( ( resolve /*, reject*/ ) => {
 
-                                    setTimeout( function() { value++; resolve(); }, 10 );
+                                    setTimeout( () => { value++; resolve(); }, 10 );
                                 });
                             });
                     })
-                    .then( function() {
+                    .then( () => {
 
                         expect( value ).to.equal( 2 );
                     });
@@ -930,14 +937,14 @@ describe( 'lib/index', function() {
 
                 let spy = sinon.spy( LAMBDA_SIMPLE_FAIL );
 
-                let returnValue = tester.loadHandler( function() {
+                let returnValue = tester.loadHandler( () => {
 
                     return spy;
                 });
 
                 expect( returnValue ).to.equal( tester );
 
-                return tester.expectFail( function() {
+                return tester.expectFail( () => {
 
                     expect( spy.calledOnce ).to.be.true;
                 });
@@ -949,11 +956,11 @@ describe( 'lib/index', function() {
 
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .after( myAfter )
-                    .expectFail( function() {
+                    .expectFail( () => {
 
                         expect( myAfter.called ).to.be.false;
                     })
-                    .then( function() {
+                    .then( () => {
 
                         expect( myAfter.calledOnce ).to.be.true;
                     });
@@ -964,11 +971,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
                     .expectFail()
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not succeed' );
                         },
-                        function( err ) {
+                        ( err ) => {
 
                             expect( err.message ).to.equal( 'encountered successful operation but expected failure - result: ok' );
                             expect( err.result ).to.equal( 'ok' );
@@ -985,7 +992,7 @@ describe( 'lib/index', function() {
                         throw new Error( 'boom' );
                     })
                     .verify( done )
-                    .then( function() {
+                    .then( () => {
 
                             expect( done.calledOnce ).to.be.true;
 
@@ -1000,11 +1007,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectFail( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should fail' );
                         },
-                        function( err ) {
+                        ( err ) => {
 
                             expect( err.message ).to.equal( 'callback called' );
                             expect( err.result ).to.equal( 'ok' );
@@ -1019,11 +1026,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
                     .expectFail( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should fail' );
                         },
-                        function( err ) {
+                        ( err ) => {
 
                             expect( err.message ).to.equal( 'callback called with error parameter' );
                             expect( err.cause.message ).to.equal( 'bang' );
@@ -1038,12 +1045,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_THROWS )
                     .expectFail( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not work' );
                         },
-
-                        function( err ) {
+                        ( err ) => {
 
                             expect( verifier.called ).to.be.false;
 
@@ -1060,11 +1066,11 @@ describe( 'lib/index', function() {
                     .timeout( 1 )
                     .expectFail()
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not work' );
                         },
-                        function( err ) {
+                        ( err ) => {
 
                             expect( err.message ).to.contain( 'handler timed out - execution time:' );
                         }
@@ -1090,7 +1096,7 @@ describe( 'lib/index', function() {
             it( 'with verifier', function() {
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
-                    .expectError( function( err ) {
+                    .expectError( ( err ) => {
 
                         expect( err.message ).to.equal( 'bang' );
                     });
@@ -1102,14 +1108,14 @@ describe( 'lib/index', function() {
 
                 let spy = sinon.spy( LAMBDA_SIMPLE_CALLBACK_ERROR );
 
-                let returnValue = tester.loadHandler( function() {
+                let returnValue = tester.loadHandler( () => {
 
                     return spy;
                 });
 
                 expect( returnValue ).to.equal( tester );
 
-                return tester.expectError( function() {
+                return tester.expectError( () => {
 
                     expect( spy.calledOnce ).to.be.true;
                 });
@@ -1121,11 +1127,11 @@ describe( 'lib/index', function() {
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK_ERROR )
                     .after( myAfter )
-                    .expectError( function() {
+                    .expectError( () => {
 
                         expect( myAfter.called ).to.be.false;
                     })
-                    .then( function() {
+                    .then( () => {
 
                         expect( myAfter.calledOnce ).to.be.true;
                     });
@@ -1138,12 +1144,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_FAIL )
                     .expectError( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not work' );
                         },
-
-                        function( err ) {
+                        ( err ) => {
 
                             expect( verifier.called ).to.be.false;
 
@@ -1159,12 +1164,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
                     .expectError( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not work' );
                         },
-
-                        function( err ) {
+                        ( err ) => {
 
                             expect( verifier.called ).to.be.false;
 
@@ -1180,12 +1184,11 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectError( verifier )
                     .then(
-                        function() {
+                        () => {
 
                             throw new Error( 'should not work' );
                         },
-
-                        function( err ) {
+                        ( err ) => {
 
                             expect( verifier.called ).to.be.false;
 
@@ -1399,6 +1402,27 @@ describe( 'lib/index', function() {
             });
         });
 
+        describe( '.verify', function() {
+
+            it( 'with .verify() and done.fail()', function() {
+
+                let done = sinon.stub();
+
+                done.fail = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .expectResult()
+                    .verify( done )
+                    .then( () => {
+
+                        expect( done.called ).to.be.false;
+
+                        expect( done.fail.calledOnce ).to.be.true;
+                        expect( done.fail.withArgs().calledOnce ).to.be.true;
+                    });
+            });
+        });
+
         describe( '.env', function() {
 
             let envPath = appRoot + '/.env';
@@ -1456,6 +1480,53 @@ describe( 'lib/index', function() {
 
                 expect( process.env.TEST_VALUE ).to.not.exist;
             });
+        });
+
+        describe( '.noVersionCheck', function() {
+
+            let originalProcess = process;
+
+            afterEach( function() {
+
+                process = originalProcess;
+            });
+
+            it( 'with version checking (default)', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult();
+            });
+
+            it( 'with version checking (no version check)', function() {
+
+                process = Object.assign( {}, originalProcess );
+                process.versions =  { node: '3.3.3' };
+
+                LambdaTester.noVersionCheck();
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult();
+            });
+
+            it( 'with version checking (wrong node version)', function() {
+
+                process = Object.assign( {}, originalProcess );
+                process.versions =  { node: '9.9.9' };
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult()
+                    .then(
+                        () => {
+
+                            throw new Error( 'should not work' );
+                        },
+                        ( err ) => {
+
+                            expect( err.message ).to.contain( 'Please test with node.js' );
+                        }
+                    );
+            });
+
         });
     });
 });
