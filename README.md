@@ -10,12 +10,12 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Works asynchronously like Lambda does
 * Detects resource leaks [experimental]
 * Supports Promises
-* Easily integrates with test frameworks
+* Easily integrates with test frameworks (Mocha and Jasmine)
 * Handlers can be loaded and removed after execution
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
 * Automatically loads .env files
-* Works with Node 4.3.2+
+* Works with Node 4.3.2
 
 ## Installation
 Install via npm.
@@ -77,7 +77,7 @@ Please note that you must return the `LambdaTester` back to the framework since 
 
 ## Documentation
 
-Complete documentation can be found in our [documentation](docs/main.md) page.
+Complete documentation can be found in our [documentation](docs) page.
 
 ## Projects Using `lambda-tester`
 
