@@ -54,6 +54,4 @@ describe( 'handler', function() {
 
 **Note:** that when testing using Jasmine, make sure you call `verify()`.
 
-I
-
 Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises.
