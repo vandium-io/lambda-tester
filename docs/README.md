@@ -22,7 +22,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 - [Verifying `callback()`](callback.md)
 - [Custom Event Values](events.md)
 - [Resource Leak Detection](leak-detection.md)
-- [Detecting Handlers than Run for Too Long](long-runnning-handlers.md)
+- [Detecting Handlers than Run for Too Long](long-running-handlers.md)
 - [Using `lambda-tester` with Mocha and Jasmine](test-frameworks.md)
 
 
