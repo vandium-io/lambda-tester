@@ -1,0 +1,17 @@
+{
+    "name": "jasmine-lambda-tester-example",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "node_modules/.bin/jasmine"
+    },
+    "author": "",
+    "license": "BSD-3-Clause",
+    "dependencies": {
+    },
+    "devDependencies": {
+        "jasmine": "^2.5.3",
+        "lambda-tester": "lambda-tester"
+    }
+}
