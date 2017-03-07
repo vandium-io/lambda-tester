@@ -1,10 +1,15 @@
 # Change Log
 
-## 2.8.0 (TBD)
+## 2.8.0 (2017-03-07)
+
+New
+
+* Added check for node version. Thanks @toaster
 
 Updated:
 
 * Automatically detects `done.fail()` to support Jasmine users. Thanks @toaster
+* Updated documentation
 
 Internal:
 
