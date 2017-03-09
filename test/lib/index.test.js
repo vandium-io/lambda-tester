@@ -1508,25 +1508,39 @@ describe( 'lib/index', function() {
                     .expectResult();
             });
 
-            it( 'with version checking (wrong node version)', function() {
+            it( 'with version checking (older node version)', function() {
 
                 process = Object.assign( {}, originalProcess );
-                process.versions =  { node: '9.9.9' };
+                process.versions =  { node: '4.3.1' };
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectResult()
                     .then(
                         () => {
-
                             throw new Error( 'should not work' );
                         },
                         ( err ) => {
-
                             expect( err.message ).to.contain( 'Please test with node.js' );
                         }
                     );
             });
 
+            it( 'with version checking (node 7.0.0)', function() {
+
+                process = Object.assign( {}, originalProcess );
+                process.versions =  { node: '7.0.0' };
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult()
+                    .then(
+                        () => {
+                            throw new Error( 'should not work' );
+                        },
+                        ( err ) => {
+                            expect( err.message ).to.contain( 'node.js 7.x is not currently supported' );
+                        }
+                    );
+            });
         });
     });
 });
