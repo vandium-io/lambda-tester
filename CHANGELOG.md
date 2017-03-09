@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.8.1 (2017-03-08)
+
+Updated:
+
+* Improved check for node version to allow versions below 7. Thanks @Kiniamaro
+
 ## 2.8.0 (2017-03-07)
 
 New
