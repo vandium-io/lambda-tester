@@ -710,7 +710,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'encountered error but expected the handler to succeed - cause: bang' );
+                            expect( err.message ).to.equal( 'context.fail() called instead of context.succeed()' );
                             expect( err.cause.message ).to.equal( 'bang' );
                         });
             });
@@ -747,7 +747,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'callback called' );
+                            expect( err.message ).to.equal( 'callback() called instead of context.succeed()' );
                             expect( err.result ).to.equal( 'ok' );
                         }
                     );
@@ -766,7 +766,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'callback called with error parameter' );
+                            expect( err.message ).to.equal( 'callback() called instead of context.succeed()' );
                             expect( err.cause.message ).to.equal( 'bang' );
                         }
                     );
@@ -977,7 +977,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'encountered successful operation but expected failure - result: ok' );
+                            expect( err.message ).to.equal( 'context.succeed() called instead of context.fail()' );
                             expect( err.result ).to.equal( 'ok' );
                         });
             });
@@ -1013,7 +1013,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'callback called' );
+                            expect( err.message ).to.equal( 'callback() called instead of context.fail()' );
                             expect( err.result ).to.equal( 'ok' );
                         }
                     );
@@ -1032,7 +1032,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'callback called with error parameter' );
+                            expect( err.message ).to.equal( 'callback() called instead of context.fail()' );
                             expect( err.cause.message ).to.equal( 'bang' );
                         }
                     );
@@ -1152,7 +1152,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'context.fail() called before callback' );
+                            expect( err.message ).to.equal( 'context.fail() called instead of callback()' );
                         }
                     );
             });
@@ -1172,7 +1172,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'context.succeed() called before callback' );
+                            expect( err.message ).to.equal( 'context.succeed() called instead of callback()' );
                         }
                     );
             });
@@ -1192,7 +1192,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'expecting error but got result: ok' );
+                            expect( err.message ).to.equal( 'expecting error but got result' );
                             expect( err.result ).to.equal( 'ok' );
                         }
                     );
@@ -1314,7 +1314,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'context.fail() called before callback' );
+                            expect( err.message ).to.equal( 'context.fail() called instead of callback()' );
                         }
                     );
             });
@@ -1335,7 +1335,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'context.succeed() called before callback' );
+                            expect( err.message ).to.equal( 'context.succeed() called instead of callback()' );
                         }
                     );
             });
@@ -1356,7 +1356,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'expecting result but error was thrown  - cause: bang' );
+                            expect( err.message ).to.equal( 'expecting result but error was thrown' );
                         }
                     );
             });
