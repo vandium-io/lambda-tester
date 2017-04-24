@@ -831,7 +831,7 @@ describe( 'lib/index', function() {
                         expect( err.handles.length ).to.be.at.least( 1 );
 
                         // our timer
-                        expect( err.handles[0].msecs ).to.equal( 100 );
+                        expect( err.handles[0]._list.msecs ).to.equal( 100 );
                     });
             });
         });
