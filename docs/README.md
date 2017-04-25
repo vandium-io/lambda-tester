@@ -12,7 +12,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
 * Automatically loads .env files
-* Works with Node 4.3.2
+* Works with Node 6.10.x
 
 ## Table of Contents
 
@@ -26,6 +26,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 - [Using `lambda-tester` with Mocha and Jasmine](test-frameworks.md)
 - [Loading handlers manually](loading.md)
 - [Using environment variables](env.md)
+- [Configuration settings](configuration.md)
 
 
 ## Feedback

@@ -2,7 +2,18 @@
 
 ## 3.0 (TBD)
 
+New:
 
+* Configuration settings file (`.lambda-tester.json`)
+
+Updated:
+
+* Better support for Node 6.10.x
+
+Internal:
+
+* Refactored to improve testability
+* Reworked Promise implementation
 
 ## 2.8.1 (2017-03-08)
 
