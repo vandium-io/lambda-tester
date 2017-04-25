@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "app-root-path": "^1.4.0",
-    "dotenv": "^2.0.0",
+    "dotenv": "^4.0.0",
     "lambda-leak": "^2.0.0",
     "uuid": "^3.0.1",
     "vandium-utils": "^1.1.1"
