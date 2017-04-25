@@ -14,6 +14,8 @@ const appRoot = require( 'app-root-path' );
 
 const LAMBDA_TESTER_PATH = '../../lib/index';
 
+const LAMBDA_TESTER_CONFIG_PATH = '../../lib/config';
+
 const LAMBDA_LONG_TIMEOUT = 1100;
 
 const LAMBDA_SIMPLE_SUCCEED = function( event, context ) {
@@ -1416,9 +1418,11 @@ describe( 'lib/index', function() {
 
         describe( '.env', function() {
 
-            let envPath = appRoot + '/.env';
+            let envPath;
 
             beforeEach( function() {
+
+                envPath = appRoot + '/.env';
 
                 delete process.env.TEST_VALUE;
                 delete process.env.LAMBDA_TESTER_NO_ENV;
@@ -1426,10 +1430,20 @@ describe( 'lib/index', function() {
                 freshy.unload( 'dotenv' );
 
                 freshy.unload( LAMBDA_TESTER_PATH );
+                freshy.unload( LAMBDA_TESTER_CONFIG_PATH );
 
                 try {
 
                     fs.unlinkSync( envPath );
+                }
+                catch( err ) {
+
+                    // ignore
+                }
+
+                try {
+
+                    fs.unlinkSync( appRoot + '/.lambda-tester.json' );
                 }
                 catch( err ) {
 
@@ -1444,6 +1458,25 @@ describe( 'lib/index', function() {
                 delete process.env.LAMBDA_TESTER_NO_ENV;
 
                 LambdaTester = require( LAMBDA_TESTER_PATH );
+
+
+                try {
+
+                    fs.unlinkSync( envPath );
+                }
+                catch( err ) {
+
+                    // ignore
+                }
+
+                try {
+
+                    fs.unlinkSync( appRoot + '/.lambda-tester.json' );
+                }
+                catch( err ) {
+
+                    // ignore
+                }
             });
 
             it( 'without .env', function() {
@@ -1470,6 +1503,18 @@ describe( 'lib/index', function() {
                 LambdaTester = require( LAMBDA_TESTER_PATH );
 
                 expect( process.env.TEST_VALUE ).to.not.exist;
+            });
+
+            it( 'with custom .env file', function() {
+
+                envPath = appRoot + '/.env-deploy';
+                fs.writeFileSync( envPath, 'TEST_VALUE=test-deploy' );
+                fs.writeFileSync( appRoot + '/.lambda-tester.json', JSON.stringify( { envFile: '.env-deploy' } ) );
+
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+
+                expect( process.env.TEST_VALUE ).to.exist;
+                expect( process.env.TEST_VALUE ).to.equal( 'test-deploy' );
             });
         });
 
