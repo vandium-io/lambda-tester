@@ -206,15 +206,6 @@ describe( 'lib/index', function() {
                 expect( tester._event ).to.not.equal( event );
             });
 
-            it( 'event missing', function() {
-
-                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
-
-                tester.event();
-
-                expect( tester._event ).to.eql( {} );
-            });
-
             it( 'event is array of events', function() {
 
                 let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );

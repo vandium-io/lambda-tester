@@ -87,7 +87,7 @@ describe( 'lib/runner', function() {
 
             it( 'successful callback:result using defaults', function() {
 
-                let instance = new LambdaRunner( 'callback:result', null, {} );
+                let instance = new LambdaRunner( 'callback:result', null, {} ).withEvent( {} );
 
                 return instance.run( (event, context, callback) => {
 
@@ -128,7 +128,7 @@ describe( 'lib/runner', function() {
 
             it( 'successful callback:error using defaults', function() {
 
-                let instance = new LambdaRunner( 'callback:error', null, {} );
+                let instance = new LambdaRunner( 'callback:error', null, {} ).withEvent( {} );
 
                 return instance.run( (event, context, callback) => {
 
@@ -144,7 +144,7 @@ describe( 'lib/runner', function() {
 
             it( 'successful context.succeed using defaults', function() {
 
-                let instance = new LambdaRunner( 'context.succeed', null, {} );
+                let instance = new LambdaRunner( 'context.succeed', null, {} ).withEvent( {} );
 
                 return instance.run( (event, context) => {
 
@@ -160,7 +160,7 @@ describe( 'lib/runner', function() {
 
             it( 'successful context.succeed using defaults, handler calling done', function() {
 
-                let instance = new LambdaRunner( 'context.succeed', null, {} );
+                let instance = new LambdaRunner( 'context.succeed', null, {} ).withEvent( {} );
 
                 return instance.run( (event, context) => {
 
@@ -176,7 +176,7 @@ describe( 'lib/runner', function() {
 
             it( 'successful context.fail using defaults', function() {
 
-                let instance = new LambdaRunner( 'context.fail', null, { timeout: 3000 } );
+                let instance = new LambdaRunner( 'context.fail', null, { timeout: 3000 } ).withEvent( {} );
 
                 return instance.run( (event, context) => {
 
@@ -192,7 +192,7 @@ describe( 'lib/runner', function() {
 
             it( 'successful context.fail using defaults, handler calling done', function() {
 
-                let instance = new LambdaRunner( 'context.fail', null, { timeout: 3000 } );
+                let instance = new LambdaRunner( 'context.fail', null, { timeout: 3000 } ).withEvent( {} );
 
                 return instance.run( (event, context) => {
 
@@ -210,7 +210,7 @@ describe( 'lib/runner', function() {
 
                 let verifier = sinon.stub();
 
-                let instance = new LambdaRunner( 'context.fail', verifier, {} );
+                let instance = new LambdaRunner( 'context.fail', verifier, {} ).withEvent( {} );
 
                 return instance.run( (event, context) => {
 
@@ -232,7 +232,7 @@ describe( 'lib/runner', function() {
 
             it( 'fail when context.fail requested and context.succeed called', function() {
 
-                let instance = new LambdaRunner( 'context.fail', null, {} );
+                let instance = new LambdaRunner( 'context.fail', null, {} ).withEvent( {} );
 
                 return instance.run( (event, context) => {
 
