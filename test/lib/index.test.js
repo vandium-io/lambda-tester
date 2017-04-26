@@ -14,6 +14,8 @@ const appRoot = require( 'app-root-path' );
 
 const LAMBDA_TESTER_PATH = '../../lib/index';
 
+const LAMBDA_TESTER_CONFIG_PATH = '../../lib/config';
+
 const LAMBDA_LONG_TIMEOUT = 1100;
 
 const LAMBDA_SIMPLE_SUCCEED = function( event, context ) {
@@ -701,7 +703,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'encountered error but expected the handler to succeed - cause: bang' );
+                            expect( err.message ).to.equal( 'context.fail() called instead of context.succeed()' );
                             expect( err.cause.message ).to.equal( 'bang' );
                         });
             });
@@ -738,7 +740,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'callback called' );
+                            expect( err.message ).to.equal( 'callback() called instead of context.succeed()' );
                             expect( err.result ).to.equal( 'ok' );
                         }
                     );
@@ -757,7 +759,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'callback called with error parameter' );
+                            expect( err.message ).to.equal( 'callback() called instead of context.succeed()' );
                             expect( err.cause.message ).to.equal( 'bang' );
                         }
                     );
@@ -822,7 +824,7 @@ describe( 'lib/index', function() {
                         expect( err.handles.length ).to.be.at.least( 1 );
 
                         // our timer
-                        expect( err.handles[0].msecs ).to.equal( 100 );
+                        expect( err.handles[0]._list.msecs ).to.equal( 100 );
                     });
             });
         });
@@ -968,7 +970,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'encountered successful operation but expected failure - result: ok' );
+                            expect( err.message ).to.equal( 'context.succeed() called instead of context.fail()' );
                             expect( err.result ).to.equal( 'ok' );
                         });
             });
@@ -1004,7 +1006,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'callback called' );
+                            expect( err.message ).to.equal( 'callback() called instead of context.fail()' );
                             expect( err.result ).to.equal( 'ok' );
                         }
                     );
@@ -1023,7 +1025,7 @@ describe( 'lib/index', function() {
                         },
                         ( err ) => {
 
-                            expect( err.message ).to.equal( 'callback called with error parameter' );
+                            expect( err.message ).to.equal( 'callback() called instead of context.fail()' );
                             expect( err.cause.message ).to.equal( 'bang' );
                         }
                     );
@@ -1143,7 +1145,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'context.fail() called before callback' );
+                            expect( err.message ).to.equal( 'context.fail() called instead of callback()' );
                         }
                     );
             });
@@ -1163,7 +1165,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'context.succeed() called before callback' );
+                            expect( err.message ).to.equal( 'context.succeed() called instead of callback()' );
                         }
                     );
             });
@@ -1183,7 +1185,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'expecting error but got result: ok' );
+                            expect( err.message ).to.equal( 'expecting error but got result' );
                             expect( err.result ).to.equal( 'ok' );
                         }
                     );
@@ -1305,7 +1307,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'context.fail() called before callback' );
+                            expect( err.message ).to.equal( 'context.fail() called instead of callback()' );
                         }
                     );
             });
@@ -1326,7 +1328,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'context.succeed() called before callback' );
+                            expect( err.message ).to.equal( 'context.succeed() called instead of callback()' );
                         }
                     );
             });
@@ -1347,7 +1349,7 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'expecting result but error was thrown  - cause: bang' );
+                            expect( err.message ).to.equal( 'expecting result but error was thrown' );
                         }
                     );
             });
@@ -1416,9 +1418,11 @@ describe( 'lib/index', function() {
 
         describe( '.env', function() {
 
-            let envPath = appRoot + '/.env';
+            let envPath;
 
             beforeEach( function() {
+
+                envPath = appRoot + '/.env';
 
                 delete process.env.TEST_VALUE;
                 delete process.env.LAMBDA_TESTER_NO_ENV;
@@ -1426,10 +1430,20 @@ describe( 'lib/index', function() {
                 freshy.unload( 'dotenv' );
 
                 freshy.unload( LAMBDA_TESTER_PATH );
+                freshy.unload( LAMBDA_TESTER_CONFIG_PATH );
 
                 try {
 
                     fs.unlinkSync( envPath );
+                }
+                catch( err ) {
+
+                    // ignore
+                }
+
+                try {
+
+                    fs.unlinkSync( appRoot + '/.lambda-tester.json' );
                 }
                 catch( err ) {
 
@@ -1444,6 +1458,25 @@ describe( 'lib/index', function() {
                 delete process.env.LAMBDA_TESTER_NO_ENV;
 
                 LambdaTester = require( LAMBDA_TESTER_PATH );
+
+
+                try {
+
+                    fs.unlinkSync( envPath );
+                }
+                catch( err ) {
+
+                    // ignore
+                }
+
+                try {
+
+                    fs.unlinkSync( appRoot + '/.lambda-tester.json' );
+                }
+                catch( err ) {
+
+                    // ignore
+                }
             });
 
             it( 'without .env', function() {
@@ -1470,6 +1503,18 @@ describe( 'lib/index', function() {
                 LambdaTester = require( LAMBDA_TESTER_PATH );
 
                 expect( process.env.TEST_VALUE ).to.not.exist;
+            });
+
+            it( 'with custom .env file', function() {
+
+                envPath = appRoot + '/.env-deploy';
+                fs.writeFileSync( envPath, 'TEST_VALUE=test-deploy' );
+                fs.writeFileSync( appRoot + '/.lambda-tester.json', JSON.stringify( { envFile: '.env-deploy' } ) );
+
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+
+                expect( process.env.TEST_VALUE ).to.exist;
+                expect( process.env.TEST_VALUE ).to.equal( 'test-deploy' );
             });
         });
 

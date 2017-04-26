@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "2.8.1",
+  "version": "3.0.0",
   "description": "Unit/Integration tests for AWS Lambda handlers",
   "main": "lib/index.js",
   "keywords": [
@@ -18,7 +18,7 @@
     "variables"
   ],
   "engines": {
-    "node": ">=4.3.2 <7.0.0"
+    "node": ">=6.0.0 <7.0.0"
   },
   "repository": {
     "type": "git",
@@ -33,14 +33,14 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "freshy": "^1.0.2",
-    "istanbul": "^0.4.2",
-    "mocha": "^3.2.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.3.0",
     "sinon": "^1.17.7"
   },
   "dependencies": {
     "app-root-path": "^1.4.0",
-    "dotenv": "^2.0.0",
-    "lambda-leak": "^1.0.0",
+    "dotenv": "^4.0.0",
+    "lambda-leak": "^2.0.0",
     "uuid": "^3.0.1",
     "vandium-utils": "^1.1.1"
   }

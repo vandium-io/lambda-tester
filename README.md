@@ -15,7 +15,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
 * Automatically loads .env files
-* Works with Node 4.3.2
+* Works with Node 6.10.x
 
 ## Installation
 Install via npm.
@@ -89,7 +89,7 @@ We'd love to get feedback on how you're using lambda-tester and things we could 
 
 ## Compatibility
 
-Version 2.x targets Lambda handlers using Node 4.3.2. If you require support for Node 0.10.36 then use version 1.0.x.
+Version 3.x targets Lambda handlers using Node 6.10.x. If you require support for Node 4.x, please use version 2.x
 
 
 ## License
