@@ -1,6 +1,16 @@
 # Change Log
 
-## 3.0 (2017-04-26)
+## 3.0.1 (2017-04-27)
+
+Fixed:
+
+* Timeout enforced for default case. Thanks @AntonBazhal
+
+Updated:
+
+* Dependencies
+
+## 3.0.0 (2017-04-26)
 
 New:
 
