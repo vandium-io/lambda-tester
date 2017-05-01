@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.0.2 (2017-05-01)
+
+Updated:
+
+* Throw original error if thrown during callback( null, result ) case to preserve original stack trace to address how console.log() formats errors
+
+
 ## 3.0.1 (2017-04-27)
 
 Fixed:

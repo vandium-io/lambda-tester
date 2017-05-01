@@ -1349,7 +1349,8 @@ describe( 'lib/index', function() {
 
                             expect( verifier.called ).to.be.false;
 
-                            expect( err.message ).to.equal( 'expecting result but error was thrown' );
+                            // Issue #19
+                            expect( err.message ).to.equal( 'bang' );
                         }
                     );
             });
