@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "Unit/Integration tests for AWS Lambda handlers",
   "main": "lib/index.js",
   "keywords": [
@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
+    "aws-xray-sdk-core": "^1.1.1",
     "dotenv": "^4.0.0",
     "lambda-leak": "^2.0.0",
     "uuid": "^3.0.1",
