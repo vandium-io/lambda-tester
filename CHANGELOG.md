@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.1.0 (TBD)
+
+New:
+
+* Verification for AWS X-Ray
+
+
 ## 3.0.2 (2017-05-01)
 
 Updated:
