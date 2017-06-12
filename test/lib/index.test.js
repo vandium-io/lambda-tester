@@ -495,7 +495,6 @@ describe( 'lib/index', function() {
 
                 let returnValue = tester.expectSucceed();
 
-                expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue;
@@ -507,7 +506,6 @@ describe( 'lib/index', function() {
 
                 let returnValue = tester.expectSucceed();
 
-                expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue;
@@ -526,7 +524,6 @@ describe( 'lib/index', function() {
 
                 let returnValue = tester.expectSucceed();
 
-                expect( returnValue ).to.be.instanceof( Promise );
                 expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue;
@@ -539,9 +536,6 @@ describe( 'lib/index', function() {
                 let verifier = sinon.stub();
 
                 let returnValue = tester.expectSucceed( verifier );
-
-                expect( returnValue ).to.be.instanceof( Promise );
-                expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue
                     .then( () => {
@@ -837,9 +831,6 @@ describe( 'lib/index', function() {
 
                 let returnValue = tester.expectFail();
 
-                expect( returnValue ).to.be.instanceof( Promise );
-                expect( returnValue.verify ).to.be.a( 'function' );
-
                 return returnValue;
             });
 
@@ -848,9 +839,6 @@ describe( 'lib/index', function() {
                 let tester = LambdaTester( LAMBDA_SIMPLE_FAIL_STRING );
 
                 let returnValue = tester.expectFail();
-
-                expect( returnValue ).to.be.instanceof( Promise );
-                expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue;
             });
@@ -868,9 +856,6 @@ describe( 'lib/index', function() {
 
                 let returnValue = tester.expectFail();
 
-                expect( returnValue ).to.be.instanceof( Promise );
-                expect( returnValue.verify ).to.be.a( 'function' );
-
                 return returnValue;
             });
 
@@ -881,9 +866,6 @@ describe( 'lib/index', function() {
                 let verifier = function( /*err*/ ) {};
 
                 let returnValue = tester.expectFail( verifier );
-
-                expect( returnValue ).to.be.instanceof( Promise );
-                expect( returnValue.verify ).to.be.a( 'function' );
 
                 return returnValue;
             });
