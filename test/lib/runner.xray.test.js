@@ -6,6 +6,8 @@ const expect = require( 'chai' ).expect;
 
 const sinon = require( 'sinon' );
 
+const LambdaRunner = require( '../../lib/runner' );
+
 const freshy = require( 'freshy' );
 
 function unload() {
@@ -25,16 +27,11 @@ describe( 'lib/runner (xray)', function() {
 
     describe( 'LambdaRunner', function() {
 
-        let LambdaRunner;
-
         let AWSXRay;
 
-        before( function() {
+        afterEach( function() {
 
-            process.env.AWS_XRAY_DEBUG_MODE = true;
-            LambdaRunner = require( '../../lib/runner' );
-
-
+            freshy.unload( 'aws-xray-sdk-core' );
         });
 
         describe( '.run', function() {
@@ -43,7 +40,14 @@ describe( 'lib/runner (xray)', function() {
 
                 let verifier = (result, additional ) => {
 
-                    console.log( additional );
+                    expect( additional.xray ).to.exist;
+                    expect( additional.xray.segments ).to.exist;
+                    expect( Array.isArray( additional.xray.segments ) ).to.be.true;
+                    expect( additional.xray.segments.length ).to.equal( 1 );
+
+                    let segment = additional.xray.segments[0];
+                    expect( segment.name ).to.equal( 'test-segment' );
+                    expect( segment.type ).to.equal( 'subsegment' );
                 };
 
                 let instance = new LambdaRunner( 'callback:result', verifier, { xray: true } ).withEvent( {} );
@@ -51,9 +55,6 @@ describe( 'lib/runner (xray)', function() {
                 return instance.run( (event, context, callback) => {
 
                         AWSXRay = require( 'aws-xray-sdk-core' );
-
-                        console.log( process.env.AWS_XRAY_DAEMON_ADDRESS );
-                        console.log( process.env._X_AMZN_TRACE_ID );
 
                         let segment = AWSXRay.getSegment().addNewSubsegment( 'test-segment' );
 
