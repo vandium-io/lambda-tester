@@ -38,7 +38,7 @@ const LAMBDA_SIMPLE_SUCCEED_DONE = function( event, context ) {
     context.done( null, 'ok' );
 };
 
-const LAMBDA_SUCCEED_LONG = function( event, context, callback ) {
+const LAMBDA_SUCCEED_LONG = function( event, context /*, callback*/ ) {
 
     setTimeout( function() {
 
@@ -61,7 +61,7 @@ const LAMBDA_SIMPLE_FAIL_DONE = function( event, context ) {
     context.done( new Error( 'bang' ) );
 };
 
-const LAMBDA_FAIL_LONG = function( event, context, callback ) {
+const LAMBDA_FAIL_LONG = function( event, context/*, callback*/ ) {
 
     setTimeout( function() {
 
@@ -106,7 +106,7 @@ const LAMBDA_CALLBACK_LONG = function( event, context, callback ) {
         }, LAMBDA_LONG_TIMEOUT );
 }
 
-const LAMBDA_THROWS = function( event, context, callback ) {
+const LAMBDA_THROWS = function( /*event, context, callback*/ ) {
 
     throw new Error( 'something happened!' );
 };
@@ -220,6 +220,21 @@ describe( 'lib/index', function() {
                 expect( tester._event ).to.be.an( 'Array' );
                 expect( tester._event[0] ).to.equal( e1 );
                 expect( tester._event[1] ).to.equal( e2 );
+            });
+        });
+
+        describe( '.xray', function() {
+
+            it( 'normal operation', function() {
+
+                let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
+
+                expect( tester.options.xray ).to.not.exist;
+
+                let returnValue = tester.xray();
+
+                expect( returnValue ).to.equal( tester );
+                expect( tester.options.xray ).to.equal( true );
             });
         });
 
