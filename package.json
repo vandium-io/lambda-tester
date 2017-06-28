@@ -31,12 +31,14 @@
   "author": "Vandium Software Inc.",
   "license": "BSD-3-Clause",
   "devDependencies": {
+    "aws-xray-sdk-core": "^1.1.1",
+    "bluebird": "^3.5.0",
     "chai": "^3.5.0",
     "freshy": "^1.0.2",
     "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
-    "sinon": "^2.1.0",
-    "aws-xray-sdk-core": "^1.1.1"
+    "proxyquire": "^1.8.0",
+    "sinon": "^2.1.0"
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
