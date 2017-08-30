@@ -42,10 +42,37 @@ describe( 'handler', function() {
 
 		return LambdaTester( myHandler )
 			.event( { name: 'Fred' } )
-			.expectResult( function( result ) {
+			.expectResult( ( result, additional ) => {
 
                 expect( result.userId ).to.exist;
                 expect( result.user ).to.equal( 'fredsmith' );
+            });
+	});
+});
+```
+
+The `additional` parameter contains information such as AWS x-ray data and execution information. The function passed to `expectResult()` can return a `Promise` to perform asynchronous operation. Operation that require a callback for asynchronous operations can use the `done` parameter:
+
+```js
+const LambdaTester = require( 'lambda-tester' );
+
+// Mocha using Chai
+const expect = require( 'chai' ).expect;
+
+const myHandler = require( '../index' ).handler;
+
+const asyncOperation = require( '../my-async-op' );
+
+describe( 'handler', function() {
+
+	it( 'test callback( null, result )', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Fred' } )
+			.expectResult( ( result, additional, done ) => {
+
+                // this function will call done when complete
+                asyncOperation( result, done );
             });
 	});
 });
@@ -89,9 +116,35 @@ describe( 'handler', function() {
 
 		return LambdaTester( myHandler )
 			.event( { name: 'Unknown' } )
-			.expectError( function( err ) {
+			.expectError( ( err, additional ) => {
 
 				expect( err.message ).to.equal( 'User not found' );
+			});
+	});
+});
+```
+
+The `additional` parameter contains information such as AWS x-ray data and execution information. The function passed to `expectError()` can return a `Promise` to perform asynchronous operation. Operation that require a callback for asynchronous operations can use the `done` parameter:
+
+```js
+const LambdaTester = require( 'lambda-tester' );
+
+// Mocha using Chai
+const expect = require( 'chai' ).expect;
+
+const myHandler = require( '../index' ).handler;
+
+const asyncOperation = require( '../my-async-op' );
+
+describe( 'handler', function() {
+
+	it( 'test callback( err )', function() {
+
+		return LambdaTester( myHandler )
+			.event( { name: 'Unknown' } )
+			.expectError( ( err, additional, done ) => {
+
+                asyncOperation( err, done );
 			});
 	});
 });
