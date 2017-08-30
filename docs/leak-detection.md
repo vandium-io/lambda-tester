@@ -70,15 +70,15 @@ describe( 'handler', function() {
 
 		return LambdaTester( function( event, context, callback ) {
 
-                setTimeout( function() {}, 100 );
+                setTimeout( () => {}, 100 );
 
                 callback( null, 'ok' );
             })
-			.expectResult( function( result ) {
+			.expectResult( ( result ) => {
 
                 throw new Error( 'should not produce a result' );
             })
-            .catch( function( err ) {
+            .catch( ( err ) => {
 
                 /* err will be:
 

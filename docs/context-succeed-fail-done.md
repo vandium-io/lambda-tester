@@ -39,7 +39,7 @@ describe( 'handler', function() {
 
 		return LambdaTester( myHandler )
 			.event( { name: 'Fred' } )
-			.expectSucceed( function( result ) {
+			.expectSucceed( ( result ) => {
 
 				expect( result.userId ).to.exist;
 				expect( result.user ).to.equal( 'fredsmith' );
@@ -88,7 +88,7 @@ describe( 'handler', function() {
 
 		return LambdaTester( myHandler )
 			.event( { name: 'Unknown' } )
-			.expectFail( function( err ) {
+			.expectFail( ( err ) => {
 
 				expect( err.message ).to.equal( 'User not found' );
 			});

@@ -579,7 +579,7 @@ describe( 'lib/index', function() {
                 let value = 1;
 
                 return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
-                    .expectSucceed( function( /*result*/ ) {
+                    .expectSucceed( ( /*result*/ ) => {
 
                         return Promise.resolve()
                             .then( function() {
@@ -594,6 +594,50 @@ describe( 'lib/index', function() {
 
                         expect( value ).to.equal( 2 );
                     });
+            });
+
+            it( 'with verifier that is async callback', function() {
+
+                let value = 1;
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectSucceed( ( result, additional, callback )  => {
+
+                        setTimeout( () => {
+
+                                value++;
+                                callback();
+                             }, 10 );
+                    })
+                    .then( () => {
+
+                        expect( value ).to.equal( 2 );
+                    });
+            });
+
+            it( 'with verifier that is async callback( err )', function() {
+
+                let value = 1;
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectSucceed( ( result, additional, callback )  => {
+
+                        setTimeout( () => {
+
+                                value++;
+                                callback( new Error( 'bang' ) );
+                             }, 10 );
+                    })
+                    .then(
+                        () => {
+
+                            throw new Error( 'should  not resolve' );
+                        },
+                        (err) => {
+
+                            expect( err.message ).to.equal( 'bang' );
+                        }
+                    );
             });
 
             it( 'Resource leak but checkForResourceLeak is disabled', function() {

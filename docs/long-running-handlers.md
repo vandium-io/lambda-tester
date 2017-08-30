@@ -19,7 +19,7 @@ describe( 'handler', function() {
 		return LambdaTester( myHandler )
 			.event( { name: 'Fred' } )
 			.timeout( 1 /* fail if longer than 1 second */ )
-			.expectResult( function( result ) {
+			.expectResult( ( result ) => {
 
                 expect( result.userId ).to.exist;
                 expect( result.user ).to.equal( 'fredsmith' );
