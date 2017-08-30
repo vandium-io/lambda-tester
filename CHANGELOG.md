@@ -6,6 +6,10 @@ New:
 
 * Verification for AWS X-Ray
 
+Internal:
+
+* Updated test dependencies
+
 
 ## 3.0.2 (2017-05-01)
 
