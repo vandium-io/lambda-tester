@@ -1580,7 +1580,9 @@ describe( 'lib/index', function() {
                 process = Object.assign( {}, originalProcess );
                 process.versions =  { node: '3.3.3' };
 
-                LambdaTester.noVersionCheck();
+                let result = LambdaTester.noVersionCheck();
+
+                expect( result ).to.equal( LambdaTester );
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectResult();
