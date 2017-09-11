@@ -4,8 +4,6 @@
 
 const expect = require( 'chai' ).expect;
 
-const sinon = require( 'sinon' );
-
 const LambdaRunner = require( '../../lib/runner' );
 
 const freshy = require( 'freshy' );

@@ -12,7 +12,7 @@ const expect = require( 'chai' ).expect;
 
 function setTimeoutAsync( delay ) {
 
-    return new Promise( ( resolve, reject ) => {
+    return new Promise( ( resolve /*, reject*/ ) => {
 
         setTimeout( () => {
 
