@@ -49,7 +49,12 @@ describe( 'lib/utils', function() {
     describe( '.createFunctionArn', function() {
 
 
-        after( function() {
+        beforeEach( function() {
+
+            delete process.env.AWS_REGION;
+        });
+
+        afterEach( function() {
 
             delete process.env.AWS_REGION;
         });
