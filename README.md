@@ -7,7 +7,9 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 
 ## Features
 * Verifies correct handler behavior
-* Works asynchronously like Lambda does
+* Works asynchronously
+* Verifies Node.js runtime version
+* AWS X-Ray support [experimental]
 * Detects resource leaks [experimental]
 * Supports Promises
 * Easily integrates with test frameworks (Mocha and Jasmine)
