@@ -1620,5 +1620,70 @@ describe( 'lib/index', function() {
                     );
             });
         });
+
+        describe( 'process.env.LAMBDA_TESTER_NODE_VERSION_CHECK', function() {
+
+            let originalProcess = process;
+
+            beforeEach( function() {
+
+                delete process.env.LAMBDA_TESTER_NODE_VERSION_CHECK;
+            });
+
+            afterEach( function() {
+
+                process = originalProcess;
+
+                delete process.env.LAMBDA_TESTER_NODE_VERSION_CHECK;
+            });
+
+            it( 'LAMBDA_TESTER_NODE_VERSION_CHECK not set', function() {
+
+                freshy.unload( LAMBDA_TESTER_PATH );
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+
+                expect( LambdaTester.isVersionCheck() ).to.be.true;
+            });
+
+            it( 'LAMBDA_TESTER_NODE_VERSION_CHECK = "false"', function() {
+
+                process.env.LAMBDA_TESTER_NODE_VERSION_CHECK = "false";
+
+                freshy.unload( LAMBDA_TESTER_PATH );
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+
+                expect( LambdaTester.isVersionCheck() ).to.be.false;
+
+                process = Object.assign( {}, originalProcess );
+                process.versions =  { node: '3.3.3' };
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult();
+            });
+
+            it( 'LAMBDA_TESTER_NODE_VERSION_CHECK = "true"', function() {
+
+                process.env.LAMBDA_TESTER_NODE_VERSION_CHECK = "true";
+
+                freshy.unload( LAMBDA_TESTER_PATH );
+                LambdaTester = require( LAMBDA_TESTER_PATH );
+
+                expect( LambdaTester.isVersionCheck() ).to.be.true;
+
+                process = Object.assign( {}, originalProcess );
+                process.versions =  { node: '4.3.1' };
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult()
+                    .then(
+                        () => {
+                            throw new Error( 'should not work' );
+                        },
+                        ( err ) => {
+                            expect( err.message ).to.contain( 'Please test with node.js' );
+                        }
+                    );
+            });
+        });
     });
 });
