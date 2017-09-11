@@ -4,7 +4,12 @@
 
 New:
 
-* Verification for AWS X-Ray
+* `LAMBDA_TESTER_NODE_VERSION_CHECK` environment variable support to prevent node version checking from running.
+* Verification for AWS X-Ray (Experimental)
+
+Updated:
+
+* Updated verifiers to support async callback
 
 Internal:
 
