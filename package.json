@@ -6,6 +6,7 @@
   "keywords": [
     "AWS",
     "Lambda",
+    "unit",
     "test",
     "mocha",
     "TDD",
@@ -15,7 +16,8 @@
     "integration testing",
     "serverless",
     "environment",
-    "variables"
+    "variables",
+    "x-ray"
   ],
   "engines": {
     "node": ">=6.0.0 <7.0.0"
