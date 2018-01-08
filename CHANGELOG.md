@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.1.1 (2018-01-08)
+
+Fixed:
+
+* Error being generated when x-ray server mock gets closed. Thanks @anyong
+
+Internal:
+
+* Migrated from istanbul to nyc for test/coverage
+
 ## 3.1.0 (2017-09-11)
 
 New:
