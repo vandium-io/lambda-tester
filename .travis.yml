@@ -4,4 +4,4 @@ node_js:
 install:
   - nvm use 6.10
   - npm install
-script: npm run coverage
+script: npm test

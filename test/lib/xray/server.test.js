@@ -24,11 +24,21 @@ function setTimeoutAsync( delay ) {
 
 describe( 'lib/xray/server', function() {
 
+    let server;
+
+    afterEach( function() {
+
+        if( server ) {
+
+            return server.stop();
+        }
+    });
+
     describe( '.processMessage', function() {
 
         it( 'valid message', function() {
 
-            let server = require( '../../../lib/xray/server' );
+            server = require( '../../../lib/xray/server' );
 
             return server.start()
                 .then( () => {
@@ -51,7 +61,7 @@ describe( 'lib/xray/server', function() {
 
         it( 'invalid message', function() {
 
-            let server = require( '../../../lib/xray/server' );
+            server = require( '../../../lib/xray/server' );
 
             let consoleLogStub = sinon.spy( console, 'log' );
 
@@ -62,7 +72,11 @@ describe( 'lib/xray/server', function() {
 
                     let client = dgram.createSocket( 'udp4' );
 
-                    return client.sendAsync( message, 2000, 'localhost' );
+                    return client.sendAsync( message, 2000, 'localhost' )
+                        .then( ()=> {
+
+                            client.close();
+                        });
                 })
                 .then( () => {
 
@@ -74,8 +88,6 @@ describe( 'lib/xray/server', function() {
 
                     expect( consoleLogStub.firstCall.args[ 0 ] ).to.equal( 'error while processing message:' );
                     expect( consoleLogStub.firstCall.args[ 1 ].message ).to.equal( 'Unexpected token u in JSON at position 0' );
-
-                    return server.stop();
                 });
         });
     });
@@ -86,7 +98,7 @@ describe( 'lib/xray/server', function() {
 
             delete process.env.LAMBDA_TASK_ROOT;
 
-            let server = require( '../../../lib/xray/server' );
+            server = require( '../../../lib/xray/server' );
 
             return server.start()
                 .then( () => {
@@ -94,14 +106,12 @@ describe( 'lib/xray/server', function() {
                     let appRootPath = require( 'app-root-path' );
 
                     expect( process.env.LAMBDA_TASK_ROOT ).to.equal( appRootPath.toString() );
-
-                    return server.stop();
                 });
         });
 
         it( 'server already running', function() {
 
-            let server = require( '../../../lib/xray/server' );
+            server = require( '../../../lib/xray/server' );
 
             return server.start()
                 .then( () => {
@@ -116,8 +126,6 @@ describe( 'lib/xray/server', function() {
 
                     expect( err ).to.exist;
                     expect( err.message ).to.equal( 'server already running' );
-
-                    return server.stop();
                 });
         });
 
@@ -125,7 +133,7 @@ describe( 'lib/xray/server', function() {
 
             let onStub = sinon.stub();
 
-            let server = proxyquire( '../../../lib/xray/server', {
+            server = proxyquire( '../../../lib/xray/server', {
 
                 'dgram': {
 
@@ -157,7 +165,7 @@ describe( 'lib/xray/server', function() {
 
         it( 'server exists', function() {
 
-            let server = require( '../../../lib/xray/server' );
+            server = require( '../../../lib/xray/server' );
 
             return server.start()
                 .then( () => {
@@ -184,7 +192,7 @@ describe( 'lib/xray/server', function() {
 
         it( 'no server', function() {
 
-            let server = require( '../../../lib/xray/server' );
+            server = require( '../../../lib/xray/server' );
 
             server.reset();
         });

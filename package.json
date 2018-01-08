@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Unit/Integration tests for AWS Lambda handlers",
   "main": "lib/index.js",
   "keywords": [
@@ -27,20 +27,29 @@
     "url": "https://github.com/vandium-io/lambda-tester.git"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --recursive",
-    "coverage": "./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- -R spec --recursive"
+    "test": "nyc mocha --recursive"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "include": [
+      "lib/**/*.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ]
   },
   "author": "Vandium Software Inc.",
   "license": "BSD-3-Clause",
   "devDependencies": {
     "aws-xray-sdk-core": "^1.1.1",
     "bluebird": "^3.5.0",
-    "chai": "^4.1.1",
     "freshy": "^1.0.2",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.3.0",
     "proxyquire": "^1.8.0",
-    "sinon": "^3.2.1"
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "nyc": "^11.3.0",
+    "sinon": "^4.0.0"
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
