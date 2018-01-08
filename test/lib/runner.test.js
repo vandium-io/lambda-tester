@@ -16,11 +16,11 @@ describe( 'lib/runner', function() {
 
             it( 'using defaults', function() {
 
-                let instance = new LambdaRunner( 'callback:result', null, {} );
+                let instance = new LambdaRunner( 'callback:result' );
 
                 expect( instance.method ).to.equal( 'callback' );
                 expect( instance.expectedOutcome ).to.equal( 'result' );
-                expect( instance.verifier ).to.be.null;
+                expect( instance.verifier ).to.be.undefined;
                 expect( instance.timeout ).to.equal( 3000 );
                 expect( instance.enforceTimeout ).to.be.false;
                 expect( instance.wantLeakDetection ).to.be.false;
