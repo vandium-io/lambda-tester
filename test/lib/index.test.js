@@ -1462,9 +1462,31 @@ describe( 'lib/index', function() {
 
             let envPath;
 
+            let filesToRemove = [];
+
+            function cleanEnvFiles() {
+
+                for( let filePath of filesToRemove ) {
+
+                    try {
+
+                        fs.unlinkSync( filePath );
+                    }
+                    catch( err ) {
+
+                        // ignore
+                    }
+                }
+            }
+
             beforeEach( function() {
 
+                filesToRemove = [];
+
                 envPath = appRoot + '/.env';
+
+                filesToRemove.push( envPath );
+                filesToRemove.push( appRoot + '/.lambda-tester.json' );
 
                 delete process.env.TEST_VALUE;
                 delete process.env.LAMBDA_TESTER_NO_ENV;
@@ -1475,23 +1497,12 @@ describe( 'lib/index', function() {
                 freshy.unload( LAMBDA_TESTER_PATH );
                 freshy.unload( LAMBDA_TESTER_CONFIG_PATH );
 
-                try {
+                cleanEnvFiles();
+            });
 
-                    fs.unlinkSync( envPath );
-                }
-                catch( err ) {
+            afterEach( function() {
 
-                    // ignore
-                }
-
-                try {
-
-                    fs.unlinkSync( appRoot + '/.lambda-tester.json' );
-                }
-                catch( err ) {
-
-                    // ignore
-                }
+                cleanEnvFiles();
             });
 
             after( function() {
@@ -1501,25 +1512,6 @@ describe( 'lib/index', function() {
                 delete process.env.LAMBDA_TESTER_NO_ENV;
 
                 LambdaTester = require( LAMBDA_TESTER_PATH );
-
-
-                try {
-
-                    fs.unlinkSync( envPath );
-                }
-                catch( err ) {
-
-                    // ignore
-                }
-
-                try {
-
-                    fs.unlinkSync( appRoot + '/.lambda-tester.json' );
-                }
-                catch( err ) {
-
-                    // ignore
-                }
             });
 
             it( 'without .env', function() {
@@ -1551,6 +1543,8 @@ describe( 'lib/index', function() {
             it( 'with custom .env file', function() {
 
                 envPath = appRoot + '/.env-deploy';
+                filesToRemove.push( envPath );
+
                 fs.writeFileSync( envPath, 'TEST_VALUE=test-deploy' );
                 fs.writeFileSync( appRoot + '/.lambda-tester.json', JSON.stringify( { envFile: '.env-deploy' } ) );
 
@@ -1563,6 +1557,8 @@ describe( 'lib/index', function() {
             it( 'with custom .env.json file', function() {
 
               envPath = appRoot + '/.env.json';
+              filesToRemove.push( envPath );
+
               fs.writeFileSync( envPath, '{"TEST_VALUE":"test-json"}' );
               fs.writeFileSync( appRoot + '/.lambda-tester.json', JSON.stringify( { envFile: '.env.json' } ) );
 
