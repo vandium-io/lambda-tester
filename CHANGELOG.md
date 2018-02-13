@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.2.0 (2018-02-14)
+
+New:
+
+* JSON formatted env files. Thanks @debugwand
+
+Internal:
+
+* Updated dependencies
+
 ## 3.1.1 (2018-01-08)
 
 Fixed:

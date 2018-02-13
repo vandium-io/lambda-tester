@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "description": "Unit/Integration tests for AWS Lambda handlers",
   "main": "lib/index.js",
   "keywords": [
@@ -44,16 +44,16 @@
   "devDependencies": {
     "aws-xray-sdk-core": "^1.1.1",
     "bluebird": "^3.5.0",
-    "freshy": "^1.0.2",
-    "proxyquire": "^1.8.0",
     "chai": "^4.1.2",
-    "mocha": "^4.0.1",
-    "nyc": "^11.3.0",
+    "freshy": "^1.0.2",
+    "mocha": "^5.0.0",
+    "nyc": "^11.4.1",
+    "proxyquire": "^1.8.0",
     "sinon": "^4.0.0"
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
-    "dotenv": "^4.0.0",
+    "dotenv": "^5.0.0",
     "dotenv-json": "^1.0.0",
     "lambda-leak": "^2.0.0",
     "uuid": "^3.0.1",
