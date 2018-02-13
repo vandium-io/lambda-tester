@@ -1470,6 +1470,7 @@ describe( 'lib/index', function() {
                 delete process.env.LAMBDA_TESTER_NO_ENV;
 
                 freshy.unload( 'dotenv' );
+                freshy.unload( 'dotenv-json' );
 
                 freshy.unload( LAMBDA_TESTER_PATH );
                 freshy.unload( LAMBDA_TESTER_CONFIG_PATH );
@@ -1558,6 +1559,18 @@ describe( 'lib/index', function() {
                 expect( process.env.TEST_VALUE ).to.exist;
                 expect( process.env.TEST_VALUE ).to.equal( 'test-deploy' );
             });
+
+            it( 'with custom .env.json file', function() {
+
+              envPath = appRoot + '/.env.json';
+              fs.writeFileSync( envPath, '{"TEST_VALUE":"test-json"}' );
+              fs.writeFileSync( appRoot + '/.lambda-tester.json', JSON.stringify( { envFile: '.env.json' } ) );
+
+              LambdaTester = require( LAMBDA_TESTER_PATH );
+
+              expect( process.env.TEST_VALUE ).to.exist;
+              expect( process.env.TEST_VALUE ).to.equal( 'test-json' );
+          });
         });
 
         describe( '.noVersionCheck', function() {
