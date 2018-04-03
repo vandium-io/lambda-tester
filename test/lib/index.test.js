@@ -1584,6 +1584,15 @@ describe( 'lib/index', function() {
                     .expectResult();
             });
 
+            it( 'with version checking (8.10.0)', function() {
+
+                process = Object.assign( {}, originalProcess );
+                process.versions =  { node: '8.10.0' };
+
+                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                    .expectResult();
+            });
+
             it( 'with version checking (no version check)', function() {
 
                 process = Object.assign( {}, originalProcess );
@@ -1614,10 +1623,10 @@ describe( 'lib/index', function() {
                     );
             });
 
-            it( 'with version checking (node 7.0.0)', function() {
+            it( 'with version checking (node 8.11.0)', function() {
 
                 process = Object.assign( {}, originalProcess );
-                process.versions =  { node: '7.0.0' };
+                process.versions =  { node: '8.11.0' };
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectResult()
@@ -1626,7 +1635,7 @@ describe( 'lib/index', function() {
                             throw new Error( 'should not work' );
                         },
                         ( err ) => {
-                            expect( err.message ).to.contain( 'node.js 7.x is not currently supported' );
+                            expect( err.message ).to.contain( 'node.js version is not currently supported, please test with an older version.' );
                         }
                     );
             });
