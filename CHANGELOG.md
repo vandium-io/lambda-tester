@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.4.0 (TBD)
+
+Updated:
+
+* Improved version checking using `semver`. Thanks @AlexHankins
+
+Fixed:
+
+* `package.json` engines to include node 8.x. Thanks @zanzamar
+
 ## 3.3.0 (2018-04-03)
 
 Updated:
