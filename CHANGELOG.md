@@ -1,10 +1,10 @@
 # Change Log
 
-## 3.4.0 (TBD)
+## 3.4.0 (2018-04-20)
 
 Updated:
 
-* Improved version checking using `semver`. Thanks @AlexHankins
+* Improved version checking using `semver`. Thanks @AlexHankins @wheresrhys
 
 Fixed:
 
