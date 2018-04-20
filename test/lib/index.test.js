@@ -1618,7 +1618,7 @@ describe( 'lib/index', function() {
                             throw new Error( 'should not work' );
                         },
                         ( err ) => {
-                            expect( err.message ).to.contain( 'Please test with node.js' );
+                            expect( err.message ).to.contain( 'Please test with node.js versions:' );
                         }
                     );
             });
@@ -1635,7 +1635,7 @@ describe( 'lib/index', function() {
                             throw new Error( 'should not work' );
                         },
                         ( err ) => {
-                            expect( err.message ).to.contain( 'node.js version is not currently supported, please test with an older version.' );
+                            expect( err.message ).to.contain( 'Please test with node.js versions:' );
                         }
                     );
             });
@@ -1700,7 +1700,7 @@ describe( 'lib/index', function() {
                             throw new Error( 'should not work' );
                         },
                         ( err ) => {
-                            expect( err.message ).to.contain( 'Please test with node.js' );
+                            expect( err.message ).to.contain( 'Please test with node.js versions:' );
                         }
                     );
             });
