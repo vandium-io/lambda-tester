@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.4.1 (2018-05-03)
+
+Fixed:
+
+* `package.json` engines statement. Thanks @kaxelson
+
+
 ## 3.4.0 (2018-04-20)
 
 Updated:
