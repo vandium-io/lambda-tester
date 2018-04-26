@@ -155,7 +155,7 @@ describe( 'lib/index', function() {
 
                 let tester = LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
-                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( tester.constructor.name ).to.equal( 'LegacyTester' );
 
                 expect( tester._handler ).to.equal( LAMBDA_SIMPLE_SUCCEED );
                 expect( tester._context ).to.eql( {} );
@@ -166,7 +166,7 @@ describe( 'lib/index', function() {
 
                 let tester = new LambdaTester( LAMBDA_SIMPLE_SUCCEED );
 
-                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( tester.constructor.name ).to.equal( 'LegacyTester' );
 
                 expect( tester._handler ).to.equal( LAMBDA_SIMPLE_SUCCEED );
                 expect( tester._context ).to.eql( {} );
@@ -177,7 +177,7 @@ describe( 'lib/index', function() {
 
                 let tester = new LambdaTester();
 
-                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( tester.constructor.name ).to.equal( 'LegacyTester' );
                 expect( tester._handler ).to.not.exist;
                 expect( tester._context ).to.eql( {} );
                 expect( tester._event ).to.eql( {} );
@@ -201,7 +201,7 @@ describe( 'lib/index', function() {
 
                 returnValue = tester.event( event );
 
-                expect( tester.constructor.name ).to.equal( 'LambdaTester' );
+                expect( tester.constructor.name ).to.equal( 'LegacyTester' );
                 expect( tester._event ).to.eql( event );
 
                 // should not be same instance
@@ -702,26 +702,6 @@ describe( 'lib/index', function() {
                     .then( () => {
 
                         expect( myAfter.calledOnce ).to.be.true;
-                    });
-            });
-
-            it( 'fail: when loadHandler does not return a handler', function() {
-
-                let tester = LambdaTester();
-
-                let stubLoader = sinon.stub();
-
-                let returnValue = tester.loadHandler( stubLoader );
-
-                expect( returnValue ).to.equal( tester );
-
-                return tester.expectSucceed( () => {
-
-                        throw new Error( 'should not succeed' );
-                    })
-                    .catch( ( err ) => {
-
-                        expect( err.message ).to.equal( 'no handler specified or returned from loadHandler()' );
                     });
             });
 
@@ -1611,16 +1591,7 @@ describe( 'lib/index', function() {
                 process = Object.assign( {}, originalProcess );
                 process.versions =  { node: '4.3.1' };
 
-                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
-                    .expectResult()
-                    .then(
-                        () => {
-                            throw new Error( 'should not work' );
-                        },
-                        ( err ) => {
-                            expect( err.message ).to.contain( 'Please test with node.js versions:' );
-                        }
-                    );
+                expect( LambdaTester.bind( null, LAMBDA_SIMPLE_CALLBACK ) ).to.throw( 'Please test with node.js versions:' );
             });
 
             it( 'with version checking (node 8.11.0)', function() {
@@ -1628,16 +1599,7 @@ describe( 'lib/index', function() {
                 process = Object.assign( {}, originalProcess );
                 process.versions =  { node: '8.11.0' };
 
-                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
-                    .expectResult()
-                    .then(
-                        () => {
-                            throw new Error( 'should not work' );
-                        },
-                        ( err ) => {
-                            expect( err.message ).to.contain( 'Please test with node.js versions:' );
-                        }
-                    );
+                expect( LambdaTester.bind( null, LAMBDA_SIMPLE_CALLBACK ) ).to.throw( 'Please test with node.js versions:' );
             });
         });
 
@@ -1693,16 +1655,7 @@ describe( 'lib/index', function() {
                 process = Object.assign( {}, originalProcess );
                 process.versions =  { node: '4.3.1' };
 
-                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
-                    .expectResult()
-                    .then(
-                        () => {
-                            throw new Error( 'should not work' );
-                        },
-                        ( err ) => {
-                            expect( err.message ).to.contain( 'Please test with node.js versions:' );
-                        }
-                    );
+                expect( LambdaTester.bind( null, LAMBDA_SIMPLE_CALLBACK ) ).to.throw( 'Please test with node.js versions:' );
             });
         });
     });
