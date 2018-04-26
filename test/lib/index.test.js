@@ -1659,4 +1659,25 @@ describe( 'lib/index', function() {
             });
         });
     });
+
+    describe( '.api', function() {
+
+        it( 'normal operation', function() {
+
+            return LambdaTester.api()
+                .httpMethod( 'POST' )
+                .resource( '/users/jdoe' )
+                .body( { one: 1, two: 'II', three: '3' } )
+                .handler( (event, context, callback) => {
+
+                    let r = Object.assign( {}, event );
+                    callback( null, r );
+                })
+                .expectResult( (result) =>{
+
+                    expect( result.body ).to.equal( JSON.stringify( { one: 1, two: 'II', three: '3' } ) );
+                    expect( result.isBase64Encoded ).to.equal( false );
+                });
+        });
+    });
 });
