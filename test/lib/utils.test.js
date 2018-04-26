@@ -83,4 +83,43 @@ describe( 'lib/utils', function() {
             expect( utils.createId().length ).to.equal( 36 );
         });
     });
+
+    describe( '.putValue', function() {
+
+        it( 'simple case', function() {
+
+            let obj = {};
+
+            utils.putValue( obj, 'val', 123 );
+
+            expect( obj.val ).to.equal( 123 );
+        });
+
+        it( 'nested case, empty case', function() {
+
+            let obj = {};
+
+            utils.putValue( obj, 'one.two.three.val', 123 );
+
+            expect( obj ).to.eql( { one: { two: { three: { val: 123 } } } } );
+        });
+
+        it( 'nested case, mixed case', function() {
+
+            let obj = { one: {} };
+
+            utils.putValue( obj, 'one.two.three.val', 123 );
+
+            expect( obj ).to.eql( { one: { two: { three: { val: 123 } } } } );
+        });
+
+        it( 'nested case for existig path', function() {
+
+            let obj = { one: { two: {  three: { val: 'abc' } } } };
+
+            utils.putValue( obj, 'one.two.three.val', 123 );
+
+            expect( obj ).to.eql( { one: { two: { three: { val: 123 } } } } );
+        });
+    });
 });
