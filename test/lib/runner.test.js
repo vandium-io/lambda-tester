@@ -138,7 +138,64 @@ describe( 'lib/runner', function() {
 
                         expect( context.getRemainingTimeInMillis() ).to.be.above( 0 );
 
-                        callback( new Error( 'bang') );
+                        callback( new Error( 'bang' ) );
+                    });
+            });
+
+            it( 'successful Promise.resolve using defaults', function() {
+
+                let instance = new LambdaRunner( 'Promise.resolve', null, {} ).withEvent( {} );
+
+                return instance.run( (event, context) => {
+
+                        expect( event ).to.eql( {} );
+                        expect( context ).to.exist;
+                        expect( context.functionName ).to.exist;
+
+                        expect( context.getRemainingTimeInMillis() ).to.be.above( 0 );
+
+                        return Promise.resolve( 'ok' );
+                    });
+            });
+
+            it( 'successful Promise.resolve with event, context, and verifier', function() {
+
+                let verifier = sinon.stub();
+
+                let instance = new LambdaRunner( 'Promise.resolve', verifier, { checkForHandleLeak: true } )
+                    .withEvent( { answer: 42 } )
+                    .withContext( { whatever: true } );
+
+                return instance.run( (event, context) => {
+
+                        expect( event ).to.eql( { answer: 42 } );
+                        expect( context ).to.exist;
+                        expect( context.functionName ).to.exist;
+                        expect( context.whatever ).to.be.true;
+
+                        return Promise.resolve( 'ok' );
+                    })
+                    .then( () => {
+
+                        expect( verifier.calledOnce ).to.be.true;
+                        expect( verifier.firstCall.args[0] ).to.equal( 'ok' );
+                        expect( verifier.firstCall.args[1].execTime ).to.exist;
+                    });
+            });
+
+            it( 'successful Promise.reject using defaults', function() {
+
+                let instance = new LambdaRunner( 'Promise.reject', null, {} ).withEvent( {} );
+
+                return instance.run( (event, context) => {
+
+                        expect( event ).to.eql( {} );
+                        expect( context ).to.exist;
+                        expect( context.functionName ).to.exist;
+
+                        expect( context.getRemainingTimeInMillis() ).to.be.above( 0 );
+
+                        return Promise.reject( new Error( 'bang' ) );
                     });
             });
 
