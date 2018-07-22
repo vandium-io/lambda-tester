@@ -22,6 +22,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 - [Getting Started](getting-started.md)
 - [Verifying `context.succeed()`, `context.fail` and `context.done()`](context-succeed-fail-done.md)
 - [Verifying `callback()`](callback.md)
+- [Verifying `Promise.resolve()` and `Promise.reject()`](promise.md)
 - [Custom Event Values](events.md)
 - [Resource Leak Detection](leak-detection.md)
 - [Detecting Handlers than Run for Too Long](long-running-handlers.md)

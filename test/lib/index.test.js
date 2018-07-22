@@ -106,6 +106,48 @@ const LAMBDA_CALLBACK_LONG = function( event, context, callback ) {
         }, LAMBDA_LONG_TIMEOUT );
 }
 
+const LAMBDA_SIMPLE_PROMISE_ERROR = function( event, context ) {
+
+    return Promise.reject( new Error( 'bang' ) );
+};
+
+const LAMBDA_PROMISE_ERROR_LONG = function( event, context ) {
+
+    return new Promise((resolve, reject) => {
+
+            setTimeout( function() {
+
+                    reject( new Error( 'bang' ) );
+                }, LAMBDA_LONG_TIMEOUT );
+        });
+}
+
+const LAMBDA_SIMPLE_PROMISE = function( event, context ) {
+
+    return Promise.resolve( 'ok' );
+};
+
+const LAMBDA_PROMISE_LONG = function( event, context ) {
+
+    if( context.getRemainingTimeInMillis() === 0 ) {
+
+        throw new Error( 'getRemainingTimeInMillis() is not working' );
+    }
+
+    return new Promise((resolve, reject) => {
+
+        setTimeout( function() {
+
+                if( context.getRemainingTimeInMillis() !== 0 ) {
+
+                    reject( new Error( 'remaining time should be 0' ) );
+                }
+
+                resolve( 'ok' );
+            }, LAMBDA_LONG_TIMEOUT );
+        });
+}
+
 const LAMBDA_THROWS = function( /*event, context, callback*/ ) {
 
     throw new Error( 'something happened!' );
@@ -1424,6 +1466,329 @@ describe( 'lib/index', function() {
                 return LambdaTester( LAMBDA_CALLBACK_LONG )
                     .timeout( 1 )
                     .expectResult()
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.contain( 'handler timed out - execution time:' );
+                        }
+                    );
+            });
+        });
+
+        describe( '.expectReject', function() {
+
+            it( 'without verifier', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE_ERROR )
+                    .expectReject();
+            });
+
+            it( 'without verifier and timeout', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE_ERROR )
+                    .timeout( 1 )
+                    .expectReject();
+            });
+
+            it( 'with verifier', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE_ERROR )
+                    .expectReject( ( err ) => {
+
+                        expect( err.message ).to.equal( 'bang' );
+                    });
+            });
+
+            it( 'with loadHandler()', function() {
+
+                let tester = LambdaTester();
+
+                let spy = sinon.spy( LAMBDA_SIMPLE_PROMISE_ERROR );
+
+                let returnValue = tester.loadHandler( () => {
+
+                    return spy;
+                });
+
+                expect( returnValue ).to.equal( tester );
+
+                return tester.expectReject( () => {
+
+                    expect( spy.calledOnce ).to.be.true;
+                });
+            });
+
+            it( 'with after()', function() {
+
+                let myAfter = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE_ERROR )
+                    .after( myAfter )
+                    .expectReject( () => {
+
+                        expect( myAfter.called ).to.be.false;
+                    })
+                    .then( () => {
+
+                        expect( myAfter.calledOnce ).to.be.true;
+                    });
+            });
+
+            it( 'fail: when context.fail() called', function() {
+
+                let verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .expectReject( verifier )
+                    .then(
+                        () => {
+
+                            throw new Error( 'should not work' );
+                        },
+                        ( err ) => {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'context.fail() called instead of Promise.reject()' );
+                        }
+                    );
+            });
+
+            it( 'fail: when context.succeed() called', function() {
+
+                let verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectReject( verifier )
+                    .then(
+                        () => {
+
+                            throw new Error( 'should not work' );
+                        },
+                        ( err ) => {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'context.succeed() called instead of Promise.reject()' );
+                        }
+                    );
+            });
+
+            it( 'fail: when Promise.resolve called', function() {
+
+                let verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE )
+                    .expectReject( verifier )
+                    .then(
+                        () => {
+
+                            throw new Error( 'should not work' );
+                        },
+                        ( err ) => {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'Promise.resolve() called instead of Promise.reject()' );
+                        }
+                    );
+            });
+
+            it( 'fail: when exception thrown inside handler', function() {
+
+                let verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_THROWS )
+                    .expectReject( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'something happened!' );
+                        }
+                    );
+            });
+
+            it( 'fail: when time exceeds allocated time', function() {
+
+                this.timeout( LAMBDA_LONG_TIMEOUT + 500 );
+
+                return LambdaTester( LAMBDA_PROMISE_ERROR_LONG )
+                    .timeout( 1 )
+                    .expectReject()
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+                        function( err ) {
+
+                            expect( err.message ).to.contain( 'handler timed out - execution time:' );
+                        }
+                    );
+            });
+        });
+
+        describe( '.expectResolve', function() {
+
+            it( 'without verifier', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE )
+                    .expectResolve();
+            });
+
+            it( 'without verifier and timeout', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE )
+                    .timeout( 1 )
+                    .expectResolve();
+            });
+
+            it( 'with verifier', function() {
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE )
+                    .expectResolve( function( result ) {
+
+                        expect( result ).to.equal( 'ok' );
+                    });
+            });
+
+            it( 'with loadHandler()', function() {
+
+                let tester = LambdaTester();
+
+                let spy = sinon.spy( LAMBDA_SIMPLE_PROMISE );
+
+                let returnValue = tester.loadHandler( function() {
+
+                    return spy;
+                });
+
+                expect( returnValue ).to.equal( tester );
+
+                return tester.expectResolve( function() {
+
+                    expect( spy.calledOnce ).to.be.true;
+                });
+            });
+
+            it( 'with after()', function() {
+
+                let myAfter = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE )
+                    .after( myAfter )
+                    .expectResolve( function() {
+
+                        expect( myAfter.called ).to.be.false;
+                    })
+                    .then( function() {
+
+                        expect( myAfter.calledOnce ).to.be.true;
+                    });
+            });
+
+            it( 'fail: when context.fail() called', function() {
+
+                let verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_FAIL )
+                    .expectResolve( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'context.fail() called instead of Promise.resolve()' );
+                        }
+                    );
+            });
+
+            it( 'fail: when context.succeed() called', function() {
+
+                let verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_SUCCEED )
+                    .expectResolve( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'context.succeed() called instead of Promise.resolve()' );
+                        }
+                    );
+            });
+
+            it( 'fail: when Promise.reject() called', function() {
+
+                let verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_SIMPLE_PROMISE_ERROR )
+                    .expectResolve( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'Promise.reject() called instead of Promise.resolve()' );
+                        }
+                    );
+            });
+
+            it( 'fail: when exception thrown inside handler', function() {
+
+                let verifier = sinon.stub();
+
+                return LambdaTester( LAMBDA_THROWS )
+                    .expectResolve( verifier )
+                    .then(
+                        function() {
+
+                            throw new Error( 'should not work' );
+                        },
+
+                        function( err ) {
+
+                            expect( verifier.called ).to.be.false;
+
+                            expect( err.message ).to.equal( 'something happened!' );
+                        }
+                    );
+            });
+
+            it( 'fail: when time exceeds allocated time', function() {
+
+                this.timeout( LAMBDA_LONG_TIMEOUT + 500 );
+
+                return LambdaTester( LAMBDA_PROMISE_LONG )
+                    .timeout( 1 )
+                    .expectResolve()
                     .then(
                         function() {
 
