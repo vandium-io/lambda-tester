@@ -1,7 +1,7 @@
 # Node.js Version Verification
 
 The default behavior of `lambda-tester` is to verify the version of the Node.js environment to ensure compatibility with the AWS Lambda
-runtime. Node.js versions of `6.10` and higher up to `8.10` are allowed.
+runtime. Node.js versions of `8.x` are allowed.
 
 ## To disable version Verification
 
