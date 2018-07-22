@@ -1,6 +1,6 @@
 {
   "name": "lambda-tester",
-  "version": "3.4.1",
+  "version": "3.5.0",
   "description": "Unit/Integration tests for AWS Lambda handlers",
   "main": "lib/index.js",
   "keywords": [
@@ -20,7 +20,7 @@
     "x-ray"
   ],
   "engines": {
-    "node": "^6.0.0 || ^8.0.0"
+    "node": ">=8.10.0"
   },
   "repository": {
     "type": "git",
