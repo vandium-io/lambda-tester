@@ -12,6 +12,10 @@ Updated:
 * Version checking is a little less strict and supports node versions in the 8.x range.
   Thanks @ArgamTorozyan
 
+Internal:
+
+  * Updated dependencies
+
 
 ## 3.4.1 (2018-05-03)
 
