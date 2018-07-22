@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.5.0 (2018-07-23)
+
+New:
+
+* Support for async handlers that return promises.
+  Thanks @jkehres @jamesdixon @dtothefp @HajoAhoMantila
+
+Updated:
+
+* Version checking is a little less strict and supports node versions in the 8.x range.
+  Thanks @ArgamTorozyan
+
+
 ## 3.4.1 (2018-05-03)
 
 Fixed:
