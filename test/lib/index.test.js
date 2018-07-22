@@ -1974,7 +1974,7 @@ describe( 'lib/index', function() {
             it( 'with version checking (older node version)', function() {
 
                 process = Object.assign( {}, originalProcess );
-                process.versions =  { node: '4.3.1' };
+                process.versions =  { node: '6.10.0' };
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectResult()
@@ -1988,10 +1988,10 @@ describe( 'lib/index', function() {
                     );
             });
 
-            it( 'with version checking (node 8.11.0)', function() {
+            it( 'with version checking (node 9.0.0)', function() {
 
                 process = Object.assign( {}, originalProcess );
-                process.versions =  { node: '8.11.0' };
+                process.versions =  { node: '9.0.0' };
 
                 return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
                     .expectResult()
