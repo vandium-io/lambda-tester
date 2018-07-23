@@ -20,7 +20,7 @@
     "x-ray"
   ],
   "engines": {
-    "node": "^8.0.0"
+    "node": ">=8.10.0"
   },
   "repository": {
     "type": "git",
@@ -42,22 +42,22 @@
   "author": "Vandium Software Inc.",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "aws-xray-sdk-core": "^1.1.1",
+    "aws-xray-sdk-core": "^1.3.0",
     "bluebird": "^3.5.1",
     "chai": "^4.1.2",
     "freshy": "^1.0.2",
-    "mocha": "^5.0.0",
-    "nyc": "^11.4.1",
+    "mocha": "^5.2.0",
+    "nyc": "^11.9.0",
     "proxyquire": "^1.8.0",
     "sinon": "^4.0.0"
   },
   "dependencies": {
-    "app-root-path": "^2.0.1",
+    "app-root-path": "^2.1.0",
     "dotenv": "^5.0.0",
     "dotenv-json": "^1.0.0",
     "lambda-leak": "^2.0.0",
     "semver": "^5.5.0",
-    "uuid": "^3.0.1",
+    "uuid": "^3.3.2",
     "vandium-utils": "^1.1.1"
   }
 }
