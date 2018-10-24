@@ -42,18 +42,18 @@
   "author": "Vandium Software Inc.",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "aws-xray-sdk-core": "^1.3.0",
+    "aws-xray-sdk-core": "^2.0.1",
     "bluebird": "^3.5.1",
     "chai": "^4.1.2",
     "freshy": "^1.0.2",
     "mocha": "^5.2.0",
-    "nyc": "^11.9.0",
-    "proxyquire": "^1.8.0",
-    "sinon": "^4.0.0"
+    "nyc": "^13.1.0",
+    "proxyquire": "^2.1.0",
+    "sinon": "^7.0.0"
   },
   "dependencies": {
     "app-root-path": "^2.1.0",
-    "dotenv": "^5.0.0",
+    "dotenv": "^6.1.0",
     "dotenv-json": "^1.0.0",
     "lambda-leak": "^2.0.0",
     "semver": "^5.5.0",
