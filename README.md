@@ -7,6 +7,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 
 ## Features
 * Verifies correct handler behavior
+* Mocks event objects based on event type
 * Works asynchronously
 * Verifies Node.js runtime version
 * AWS X-Ray support [experimental]

@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0 (TBD)
+
+New:
+
+* Event mocks (via `lambda-event-mock`)
+
 ## 3.5.0 (2018-07-23)
 
 New:

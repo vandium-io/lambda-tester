@@ -12,6 +12,8 @@ const freshy = require( 'freshy' );
 
 const appRoot = require( 'app-root-path' );
 
+const eventIdentifier = require( '@vandium/event-identifier' );
+
 const LAMBDA_TESTER_PATH = '../../lib/index';
 
 const LAMBDA_TESTER_CONFIG_PATH = '../../lib/config';
@@ -223,6 +225,16 @@ describe( 'lib/index', function() {
                 expect( tester._handler ).to.not.exist;
                 expect( tester._context ).to.eql( {} );
                 expect( tester._event ).to.eql( {} );
+            });
+        });
+
+        describe( '.mocks', function() {
+
+            it( 'normal operation', function() {
+
+                let mockEvent = LambdaTester.mocks.s3().object( 'my-object' ).bucket( 'my-bucket' ).build();
+
+                expect( eventIdentifier.identify( mockEvent ) ).to.equal( 's3' );
             });
         });
 
