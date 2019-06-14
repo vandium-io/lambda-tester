@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.6.0 (TBD)
+
+Updated:
+
+* Version checking supports node 10. Thanks @joskark @bvalosek @stewartjarod
+
+Internal:
+
+* Updated dependencies
+
+
 ## 3.5.0 (2018-07-23)
 
 New:
