@@ -231,7 +231,7 @@ describe( 'lib/runner', function() {
                     });
             });
 
-            it( 'unexpected failure when context.succeed expected', function() {
+            it( 'maintains the stack when there is an unexpected failure and context.succeed expected', function() {
 
                 let instance = new LambdaRunner( 'context.succeed', null, {} ).withEvent( {} );
 
