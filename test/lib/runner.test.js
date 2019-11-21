@@ -231,6 +231,25 @@ describe( 'lib/runner', function() {
                     });
             });
 
+            it( 'maintains the stack when there is an unexpected failure and context.succeed expected', function() {
+
+                let instance = new LambdaRunner( 'context.succeed', null, {} ).withEvent( {} );
+
+                return instance.run( (event, context) => {
+                        return new Promise(() => {
+                            throw new Error('Bang');
+                        });
+                    }).then(
+                        () => {
+
+                            throw new Error( 'should not resolve' );
+                        },
+                        (err) => {
+                            expect( err.stack ).to.contain( 'runner.test.js' );
+                        }
+                    );
+            });
+
             it( 'successful context.fail using defaults', function() {
 
                 let instance = new LambdaRunner( 'context.fail', null, { timeout: 3000 } ).withEvent( {} );
