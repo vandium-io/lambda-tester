@@ -6,6 +6,16 @@ New:
 
 * Event mocks (via `lambda-event-mock`)
 
+## 3.6.0 (2018-06-14)
+
+Updated:
+
+* Version checking supports node 10. Thanks @joskark @bvalosek @stewartjarod
+
+Internal:
+
+* Updated dependencies
+
 ## 3.5.0 (2018-07-23)
 
 New:
