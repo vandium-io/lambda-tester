@@ -6,6 +6,11 @@ New:
 
 * Event mocks (via `lambda-event-mock`)
 
+Updated:
+
+* Supports nodejs 12. Thanks @jkehres
+ 
+
 ## 3.6.0 (2018-06-14)
 
 Updated:
