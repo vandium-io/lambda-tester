@@ -8,6 +8,7 @@ New:
 
 Updated:
 
+* Better support for stack traces. Thanks @edbo @d-w4lsh
 * Supports nodejs 12. Thanks @jkehres
  
 
