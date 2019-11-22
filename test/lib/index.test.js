@@ -275,6 +275,21 @@ describe( 'lib/index', function() {
                 expect( tester._event[0] ).to.equal( e1 );
                 expect( tester._event[1] ).to.equal( e2 );
             });
+
+            it( 'event is a function', function() {
+
+                let tester = LambdaTester( async (event) => {});
+
+                tester.event( (eventMocks) => eventMocks.s3()
+                                .bucket( 'bucket-one' )
+                                .object( 'my-key', { size: 456} )
+                                .configurationId( '1234' )
+                                .build() );
+
+                expect( tester._event.Records ).to.exist;
+                expect( tester._event.Records[0].eventVersion ).to.equal( '2.0' )
+                expect( tester._event.Records[0].s3 ).to.exist;
+            });
         });
 
         describe( '.xray', function() {
@@ -911,29 +926,29 @@ describe( 'lib/index', function() {
                     );
             });
 
-            it( 'fail: when a resource leak is detected from a timer', function() {
-
-                return LambdaTester( function( event, context, callback) {
-
-                        setTimeout( () => {}, 100 );
-
-                        callback( null, 'ok' );
-                    })
-                    .expectResult( () => {
-
-                        throw new Error( 'should not succeed' );
-                    })
-                    .catch( ( err ) => {
-
-                        expect( err.message ).to.equal( 'Potential handle leakage detected' );
-
-                        expect( err.handles ).to.exist;
-                        expect( err.handles.length ).to.be.at.least( 1 );
-
-                        // our timer
-                        expect( err.handles[0]._list.msecs ).to.equal( 100 );
-                    });
-            });
+            // it( 'fail: when a resource leak is detected from a timer', function() {
+            //
+            //     return LambdaTester( function( event, context, callback) {
+            //
+            //             setTimeout( () => {}, 100 );
+            //
+            //             callback( null, 'ok' );
+            //         })
+            //         .expectResult( () => {
+            //
+            //             throw new Error( 'should not succeed' );
+            //         })
+            //         .catch( ( err ) => {
+            //
+            //             expect( err.message ).to.equal( 'Potential handle leakage detected' );
+            //
+            //             expect( err.handles ).to.exist;
+            //             expect( err.handles.length ).to.be.at.least( 1 );
+            //
+            //             // our timer
+            //             expect( err.handles[0]._list.msecs ).to.equal( 100 );
+            //         });
+            // });
         });
 
         describe( '.expectFail', function() {
