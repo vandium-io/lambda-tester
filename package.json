@@ -22,12 +22,15 @@
   "engines": {
     "node": ">=10.0"
   },
+  "files": [
+    "/lib"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/vandium-io/lambda-tester.git"
   },
   "scripts": {
-    "test": "nyc mocha --recursive"
+    "test": "nyc mocha 'lib/**/__tests__/*' --recursive"
   },
   "nyc": {
     "check-coverage": true,
@@ -44,7 +47,6 @@
   "devDependencies": {
     "@vandium/event-identifier": "^3.0.0",
     "aws-xray-sdk-core": "^2.3.3",
-    "bluebird": "^3.5.5",
     "chai": "^4.2.0",
     "freshy": "^1.0.2",
     "mocha": "^6.1.4",
