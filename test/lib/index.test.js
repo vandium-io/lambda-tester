@@ -1998,38 +1998,70 @@ describe( 'lib/index', function() {
                     .expectResult();
             });
 
-            it( 'with version checking (older node version)', function() {
+            it( 'with version checking (older node version)', async function() {
 
                 process = Object.assign( {}, originalProcess );
                 process.versions =  { node: '6.10.0' };
 
-                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
-                    .expectResult()
-                    .then(
-                        () => {
-                            throw new Error( 'should not work' );
-                        },
-                        ( err ) => {
-                            expect( err.message ).to.contain( 'Please test with node.js versions:' );
-                        }
-                    );
+                LambdaTester.enableVersionCheck();
+
+                try {
+
+                    await LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                        .expectResult();
+
+                    throw new Error( 'should not work' );
+                }
+                catch( err ) {
+
+                    expect( err.message ).to.contain( 'Please test with node.js versions:' );
+                }
+                finally {
+
+                    LambdaTester.enableVersionCheck( false );
+                }
             });
 
-            it( 'with version checking (node 9.0.0)', function() {
+            it( 'with version checking (node 11)', async function() {
 
                 process = Object.assign( {}, originalProcess );
-                process.versions =  { node: '9.0.0' };
+                process.versions =  { node: '11.0.0' };
 
-                return LambdaTester( LAMBDA_SIMPLE_CALLBACK )
-                    .expectResult()
-                    .then(
-                        () => {
-                            throw new Error( 'should not work' );
-                        },
-                        ( err ) => {
-                            expect( err.message ).to.contain( 'Please test with node.js versions:' );
-                        }
-                    );
+                LambdaTester.enableVersionCheck();
+
+                try {
+
+                    await LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                        .expectResult();
+
+                    throw new Error( 'should not work' );
+                }
+                catch( err ) {
+
+                    expect( err.message ).to.contain( 'Please test with node.js versions:' );
+                }
+                finally {
+
+                    LambdaTester.enableVersionCheck( false );
+                }
+            });
+
+            it( 'with version checking (node 12)', async function() {
+
+                process = Object.assign( {}, originalProcess );
+                process.versions =  { node: '12.0.0' };
+
+                LambdaTester.enableVersionCheck();
+
+                try {
+
+                    await LambdaTester( LAMBDA_SIMPLE_CALLBACK )
+                        .expectResult();
+                }
+                finally {
+
+                    LambdaTester.enableVersionCheck( false );
+                }
             });
         });
 
@@ -2054,7 +2086,7 @@ describe( 'lib/index', function() {
                 freshy.unload( LAMBDA_TESTER_PATH );
                 LambdaTester = require( LAMBDA_TESTER_PATH );
 
-                expect( LambdaTester.isVersionCheck() ).to.be.true;
+                expect( LambdaTester.isVersionCheck() ).to.be.false;
             });
 
             it( 'LAMBDA_TESTER_NODE_VERSION_CHECK = "false"', function() {
