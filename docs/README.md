@@ -14,6 +14,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Handlers can be loaded and removed after execution
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
+* Support for `lambda-event-mock` to create mock events with code
 * Automatically loads .env files
 * Works with Node 12.x
 

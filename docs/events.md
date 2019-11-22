@@ -47,3 +47,27 @@ describe( 'handler', function() {
 	});
 });
 ```
+
+Events can also be created using the `lambda-event-mock` library. This is achieved
+by supplying a function to `event()`:
+
+```js
+const LambdaTester = require( 'lambda-tester' );
+
+const myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'normal operation', async function() {
+
+		await LambdaTester( myHandler )
+			.event( (eventMocks) => eventMocks.s3()
+						.bucket( 'my-bucket' )
+						.object( 'my-key', { size: 456} )
+						.configurationId( '1234' )
+						.build()
+				  )
+			.expectResult();
+	});
+});
+```
