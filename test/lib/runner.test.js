@@ -6,7 +6,23 @@ const expect = require( 'chai' ).expect;
 
 const sinon = require( 'sinon' );
 
+const net = require('net');
+
 const LambdaRunner = require( '../../lib/runner' );
+
+const DEFAULT_SERVER_PORT = 10005;
+
+function createTestServer( port = DEFAULT_SERVER_PORT ) {
+
+    const server = net.createServer(function(socket) {
+     socket.write('Echo server\r\n');
+     socket.pipe(socket);
+    });
+
+    server.listen(port, '127.0.0.1');
+
+    return server;
+}
 
 describe( 'lib/runner', function() {
 
@@ -417,26 +433,38 @@ describe( 'lib/runner', function() {
                     );
             });
 
-            it( 'fail when leak is detected', function() {
+            it( 'fail when leak is detected', async function() {
 
                 let instance = new LambdaRunner( 'callback:result', null, { checkForHandleLeak: true } );
 
-                return instance.run( (event, context, callback) => {
+                const server = createTestServer();
 
-                        setTimeout( ()=>{}, 100 );
+                let client;
 
-                        callback( null, 'ok' );
-                    })
-                    .then(
-                        () => {
+                try {
 
-                            throw new Error( 'should not resolve' );
-                        },
-                        (err) => {
+                    await instance.run( (event, context, callback) => {
 
-                            expect( err.message ).to.equal( 'Potential handle leakage detected' );
-                        }
-                    );
+                            client = new net.Socket();
+                            client.connect( DEFAULT_SERVER_PORT, '127.0.0.1', () => {} );
+                            callback( null, 'ok' );
+                        });
+
+                    throw new Error( 'should not resolve' );
+                }
+                catch( err ) {
+
+                    expect( err.message ).to.equal( 'Potential handle leakage detected' );
+                }
+                finally {
+
+                    if( client ) {
+
+                        client.destroy();
+                    }
+
+                    server.close();
+                }
             });
         });
     });
