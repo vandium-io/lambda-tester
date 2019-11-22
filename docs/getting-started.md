@@ -54,4 +54,20 @@ describe( 'handler', function() {
 
 **Note:** that when testing using Jasmine, make sure you call `verify()`.
 
-Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises.
+Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises. Additionally you can run the test by declaring the test as `async`:
+
+```js
+const LambdaTester = require( 'lambda-tester' );
+
+const myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test failure', async function() {
+
+		await LambdaTester( myHandler )
+			.event( { name: 'Unknown' } )
+			.expectError();
+	});
+});
+```

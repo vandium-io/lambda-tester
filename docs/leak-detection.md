@@ -29,7 +29,8 @@ describe( 'handler', function() {
 
 		return LambdaTester( function( event, context, callback ) {
 
-                setTimeout( function() {}, 100 );
+				// leaks a resource
+
 
                 callback( null, 'ok' );
             })
@@ -39,18 +40,6 @@ describe( 'handler', function() {
             });
 	});
 });
-```
-
-Examining the exception thrown will indicate a leak was detected and the handles for the resources that are still open:
-
-```js
-{ [Error: Potential handle leakage detected]
-  handles:
-   [ Timer {
-       '0': [Function: listOnTimeout],
-       _idleNext: [Object],
-       _idlePrev: [Object],
-       msecs: 100 } ] }
 ```
 
 If you are adding leak detection as one of your unit tests, then the previous code should be changed to:
@@ -70,7 +59,7 @@ describe( 'handler', function() {
 
 		return LambdaTester( function( event, context, callback ) {
 
-                setTimeout( () => {}, 100 );
+				// leak here
 
                 callback( null, 'ok' );
             })
@@ -79,17 +68,6 @@ describe( 'handler', function() {
                 throw new Error( 'should not produce a result' );
             })
             .catch( ( err ) => {
-
-                /* err will be:
-
-                { [Error: Potential handle leakage detected]
-                  handles:
-                   [ Timer {
-                       '0': [Function: listOnTimeout],
-                       _idleNext: [Object],
-                       _idlePrev: [Object],
-                       msecs: 100 } ] }
-                */
 
                 expect( err.message ).to.contain( 'Potential handle leakage detected' );
 

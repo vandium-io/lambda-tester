@@ -1,9 +1,7 @@
 # Verifying Promises
 
-On April 2, 2018 AWS Lambda introduced support for Node.js 8.10 and Lambda handlers that can return a promise directly -
-eliminating the need to invoke the callback previously passed to the handler or the earlier `context.fail()`,
-`context.succeed()` and `context.done()` methods.
-
+Lambda handlers can return a promise directly, thus simplifying the code and
+eliminating the need to invoke a callback.
 
 ## Verifying `Promise.resolve()`
 

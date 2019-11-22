@@ -6,11 +6,15 @@ New:
 
 * Event mocks (via `lambda-event-mock`)
 
+Changed:
+
+* Node.js versions are no longer checked before running the tests.
+
 Updated:
 
 * Better support for stack traces. Thanks @edbo @d-w4lsh
 * Supports nodejs 12. Thanks @jkehres
- 
+
 
 ## 3.6.0 (2018-06-14)
 

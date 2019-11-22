@@ -18,7 +18,7 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
 * Automatically loads .env files
-* Works with Node 8.10.x, 10.x, and 12.x
+* Works with Node 10.x, and 12.x
 
 ## Installation
 Install via npm.
@@ -76,7 +76,23 @@ describe( 'handler', function() {
 });
 ```
 
-Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises.
+Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises. Additionally you can run the test by declaring the test as `async`:
+
+```js
+const LambdaTester = require( 'lambda-tester' );
+
+const myHandler = require( '../index' ).handler;
+
+describe( 'handler', function() {
+
+	it( 'test failure', async function() {
+
+		await LambdaTester( myHandler )
+			.event( { name: 'Unknown' } )
+			.expectError();
+	});
+});
+```
 
 ## Documentation
 
@@ -92,7 +108,7 @@ We'd love to get feedback on how you're using lambda-tester and things we could 
 
 ## Compatibility
 
-Starting with version 3.5.0, lambda-tester supports node versions 8.11 and higher. If you require support for older versions of node, then use a previous version of lambda-tester.
+Starting with version 4.0, lambda-tester supports node versions 10 and higher. If you require support for older versions of node, then use a previous version of lambda-tester.
 
 
 ## License
