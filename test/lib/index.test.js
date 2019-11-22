@@ -234,7 +234,7 @@ describe( 'lib/index', function() {
 
                 let mockEvent = LambdaTester.mocks.s3().object( 'my-object' ).bucket( 'my-bucket' ).build();
 
-                expect( eventIdentifier.identify( mockEvent ) ).to.equal( 's3' );
+                expect( eventIdentifier.identify( mockEvent ) ).to.eql( { type: 's3' } );
             });
         });
 
