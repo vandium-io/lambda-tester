@@ -1,4 +1,4 @@
-# Custom Event Values
+# Event Values
 
 Custom events can be provided to `lambda-tester` using `event()`, which accepts an object, array or value.
 
@@ -71,3 +71,6 @@ describe( 'handler', function() {
 	});
 });
 ```
+
+For more information about event mocks, see
+[`lambda-event-mock`](https://github.com/vandium-io/lambda-event-mock).

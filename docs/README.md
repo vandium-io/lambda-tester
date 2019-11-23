@@ -4,33 +4,33 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 
 ## Features
 * Verifies correct handler behavior
-* Mocks event objects based on event type
+* Mocks event types with code
 * Works asynchronously
+* Supports Promises
+* Verifies Node.js runtime version
 * AWS X-Ray support [experimental]
 * Detects resource leaks [experimental]
-* Verifies Node.js runtime version
-* Supports Promises
 * Easily integrates with test frameworks (Mocha and Jasmine)
 * Handlers can be loaded and removed after execution
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
-* Support for `lambda-event-mock` to create mock events with code
 * Automatically loads .env files
-* Works with Node 12.x
+* Works with Node 10.x, and 12.x
+
 
 ## Table of Contents
 
 - [Installation](installation.md)
 - [Getting Started](getting-started.md)
+- [Event Values](events.md)
+- [Using environment variables](env.md)
 - [Verifying `context.succeed()`, `context.fail` and `context.done()`](context-succeed-fail-done.md)
 - [Verifying `callback()`](callback.md)
 - [Verifying `Promise.resolve()` and `Promise.reject()`](promise.md)
-- [Custom Event Values](events.md)
 - [Resource Leak Detection](leak-detection.md)
 - [Detecting Handlers than Run for Too Long](long-running-handlers.md)
 - [Using `lambda-tester` with Mocha and Jasmine](test-frameworks.md)
 - [Loading handlers manually](loading.md)
-- [Using environment variables](env.md)
 - [Configuration settings](configuration.md)
 - [Node.js Version Verification](node-version-verification.md)
 

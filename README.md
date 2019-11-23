@@ -7,17 +7,16 @@ Simplifies writing unit tests for [AWS Lambda](https://aws.amazon.com/lambda/det
 
 ## Features
 * Verifies correct handler behavior
-* Mocks event objects based on event type
+* Mocks event types with code
 * Works asynchronously
+* Supports Promises
 * Verifies Node.js runtime version
 * AWS X-Ray support [experimental]
 * Detects resource leaks [experimental]
-* Supports Promises
 * Easily integrates with test frameworks (Mocha and Jasmine)
 * Handlers can be loaded and removed after execution
 * Lightweight and won't impact performance
 * Maps the environment variable `LAMBDA_TASK_ROOT` to the application's root
-* Support for `lambda-event-mock` to create mock events with code
 * Automatically loads .env files
 * Works with Node 10.x, and 12.x
 
