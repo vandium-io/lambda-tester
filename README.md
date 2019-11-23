@@ -48,36 +48,18 @@ const myHandler = require( '../index' ).handler;
 
 describe( 'handler', function() {
 
-	it( 'test success', function() {
+	it( 'test success', async function() {
 
-		return LambdaTester( myHandler )
+		await LambdaTester( myHandler )
 			.event( { name: 'Fred' } )
 			.expectResult();
 	});
 });
 ```
 
-If the handler decides to call `callback( err )` then the verification will fail and the test will fail.
+If the handler calls `callback( err )`, then the test will fail.
 
 Additionally, if one wanted to test for failure, then the following code would be used:
-
-```js
-const LambdaTester = require( 'lambda-tester' );
-
-const myHandler = require( '../index' ).handler;
-
-describe( 'handler', function() {
-
-	it( 'test failure', function() {
-
-		return LambdaTester( myHandler )
-			.event( { name: 'Unknown' } )
-			.expectError();
-	});
-});
-```
-
-Please note that you must return the `LambdaTester` back to the framework since `lambda-tester` is asynchronous and uses Promises. Additionally you can run the test by declaring the test as `async`:
 
 ```js
 const LambdaTester = require( 'lambda-tester' );
@@ -94,6 +76,9 @@ describe( 'handler', function() {
 	});
 });
 ```
+
+**Note:** you must either return the `LambdaTester` instance back to the testing
+framework or use the `await`/`async` keywords.
 
 ## Documentation
 
