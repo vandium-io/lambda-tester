@@ -2,19 +2,30 @@
 
 ## 4.0.0 (TBD)
 
+Breaking:
+
+* Strict checking for how the results/errors are captured have been relaxed. this
+  can be re-enabled using the `strict()` method after creating the `LambdaTester`
+  instance.
+
+* Node.js versions are no longer checked before running the tests.
+
 New:
 
 * Event mocks (via `lambda-event-mock`)
 
-Changed:
-
-* Node.js versions are no longer checked before running the tests.
-
 Updated:
 
+* `expectResult()` and `expectError()` are now the preferred methods to verify
+  the handler's execution. If strict mode is enabled, then it will enforce that
+  the callback is called.
 * Better support for stack traces. Thanks @edbo @d-w4lsh
 * Supports nodejs 12. Thanks @jkehres
 
+Internal:
+
+* Updated dependencies
+* Refactored unit tests
 
 ## 3.6.0 (2018-06-14)
 
