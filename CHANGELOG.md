@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.1 (2019-12-04)
+
+Update:
+
+* Remove note about Node version check in documentation. Thanks @munierujp
+
 ## 4.0.0 (2019-11-23)
 
 Breaking:
