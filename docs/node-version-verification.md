@@ -17,7 +17,7 @@ LAMBDA_TESTER_NODE_VERSION_CHECK=true
 ### Via code
 
 ```js
-// disable version checking
+// enable version checking
 const LambdaTester = require( 'lambda-tester' ).enableVersionCheck();
 
 // Lambda handler
